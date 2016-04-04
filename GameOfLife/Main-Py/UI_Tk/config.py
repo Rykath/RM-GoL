@@ -2,14 +2,19 @@
 Created on Apr 3, 2016
 
 @author: robert
+Package: UI_Tk
 
-config/settings for Tkinter-based GUI
+Usage: config/settings for Tkinter-based GUI
 '''
 
-#Viewer
-Vwidth = 500
-Vheight = 500
+#menubar
+Mwidth = 500 #total width
+Mheight = 20
 
 #control
-Cwidth = 100
-Cheight = Vheight
+Cwidth = Mwidth/2
+Cheight = 500
+
+#details
+Dwidth = Mwidth/2
+Dheight = Cheight
