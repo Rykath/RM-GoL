@@ -1,7 +1,7 @@
 '''
 Created on Apr 3, 2016
 
-@author: robert
+@author: Rykath
 Package: UI_Tk
 
 Usage: config/settings for Tkinter-based GUI

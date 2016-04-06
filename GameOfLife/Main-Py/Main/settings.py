@@ -6,4 +6,6 @@ Created on Apr 3, 2016
 contains variables for settings and related functions
 '''
 
+user = 'Rykath' #will be removed!
+
 gui = 'console'
