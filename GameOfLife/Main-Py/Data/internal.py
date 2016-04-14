@@ -27,8 +27,8 @@ class Pattern():
         self.type = ''          #empty = undiscovered
         self.name = ''          #empty = unknown/unnamed
         self.num = 0            #id in type   
-        self.creator = ''       #discovered by, empty = not specified yet
-        self.author = author    #put into database by, REQUIRED
+        self.author = ''        #discovered by, empty = not specified yet
+        self.committer = author    #put into database by, REQUIRED
         self.description = ''   #purpose/usage
         self.trivia = ''        #history
         

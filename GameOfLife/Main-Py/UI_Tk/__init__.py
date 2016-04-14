@@ -32,15 +32,13 @@ class GUI(tk.Frame):
         self.control.grid(row=1, column=0, sticky='nsew')
         self.details.grid(row=1, column=1, sticky='nsew')
         
-        self.labV = 0
-        
         self.grid()
         self.createWidgets()
     
     def createWidgets(self):
         #menubar
         self.menubar.sections = []
-        self.menubar.sections.append(tk.Button(self.menubar,text='quit',bg='white',command=lambda: self.exit(self)))
+        self.menubar.sections.append(tk.Button(self.menubar,text='quit',bg='white',command=self.quit))
         self.menubar.sections[-1].grid(row=0, column=0, sticky='ns', padx=2, pady=2)
         #control
         self.control.sections = []
@@ -48,20 +46,11 @@ class GUI(tk.Frame):
         self.control.sections[-1].grid(row=0, column=0, sticky='nw', padx=2, pady=2)
     
     def lab(self):
-        if self.labV == 0 :
-            self.labV = 1
-            self.lab = tk.Toplevel()
-            self.lab.wm_title('Laboratory')
-            lab.createWidgets(self.lab)
-            #self.lab.test = tk.Button(self.new,text='quit',bg='white',command=lambda: self.exit(self.lab,self.labV))
-            #self.lab.test.grid(row=0, column=0, sticky='ns', padx=2, pady=2)
+        self.lab = tk.Toplevel()
+        self.lab.wm_title('Laboratory')
+        self.lab.parent = self
+        lab.createWidgets(self.lab)
+        lab.updateGrid(self.lab,self.lab.data)
     
-    def exit(self,instance,var=None):
-        if instance == self :
-            self.quit()
-        else:
-            instance.destroy()
-        if var != None :
-            var = 0
     
         
