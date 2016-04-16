@@ -9,7 +9,7 @@ Usage: main file for Engine with standard-algorithm
 
 import math
 
-def Tick(data,count=None):
+def Tick(size,data,count=None):
     data,count = Resize(data,count)
     dataN = []
     for y in range(len(data)):
@@ -19,7 +19,9 @@ def Tick(data,count=None):
                 dataN[y].append(1)
             else:
                 dataN[y].append(0)
-    Resize(data,count)
+    dataN,count = Resize(dataN,count)
+    dataN,count = Extendto(size,dataN,count)
+    return (dataN,count)
 
 def Resize(data,count=None):
     #returns resized data & count
@@ -43,6 +45,7 @@ def Resize(data,count=None):
         count = Count(data)
     #shrink
     for y in range(len(count)):
+        testX = 0
         for x in range(len(count[y])):
             if x == 0:
                 testY.append(0)
@@ -57,12 +60,12 @@ def Resize(data,count=None):
     for i in range(len(freeX)):
         if border[0] == freeX[i]:
             border[0] += 1
-        if len(data[0])-border[1] == freeX[-1*(i+1)]:
+        if len(data[0])-border[1]-1 == freeX[-1*(i+1)]:
             border[1] += 1
     for i in range(len(freeY)):
         if border[2] == freeY[i]:
             border[2] += 1
-        if len(data)-border[3] == freeY[-1*(i+1)]:
+        if len(data)-border[3]-1 == freeY[-1*(i+1)]:
             border[3] += 1
     dataN = []
     countN = []
@@ -70,19 +73,19 @@ def Resize(data,count=None):
         dataN.append([])
         countN.append([])
         for x in range(len(data[0])-border[0]-border[1]):
-            dataN[y].append(data[y-border[0]][x-border[2]])
-            countN[y].append(count[y-border[0]][x-border[2]])
+            dataN[y].append(data[y+border[0]][x+border[2]])
+            countN[y].append(count[y+border[0]][x+border[2]])
     return (dataN,countN)
 
 def Extendto(size,data,count=None):
     #auto-center
     border = [0,0,0,0]
-    if len(data[0]) > size[0]:
-        border[0] = math.floor((size[0]-len(data[0]))/2)
-        border[1] = math.floor((size[0]-len(data[0]))/2)+(size[0]-len(data[0]))%2
-    if len(data) > size[1]:
-        border[2] = math.floor((size[1]-len(data))/2)
-        border[3] = math.floor((size[1]-len(data))/2)+(size[1]-len(data))%2
+    if len(data[0]) < size[0]:
+        border[0] = int(math.floor((size[0]-len(data[0]))/2))
+        border[1] = int(math.floor((size[0]-len(data[0]))/2)+(size[0]-len(data[0]))%2)
+    if len(data) < size[1]:
+        border[2] = int(math.floor((size[1]-len(data))/2))
+        border[3] = int(math.floor((size[1]-len(data))/2)+(size[1]-len(data))%2)
     return Extend(border,data,count)
 
 def Extend(border,data,count=None):

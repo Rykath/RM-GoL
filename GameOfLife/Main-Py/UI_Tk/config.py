@@ -7,14 +7,20 @@ Package: UI_Tk
 Usage: config/settings for Tkinter-based GUI
 '''
 
+#main
 #menubar
-Mwidth = 500 #total width
-Mheight = 20
 
 #control
-Cwidth = Mwidth/2
-Cheight = 500
+MCwidth = 250
+MCheight = 500
 
 #details
-Dwidth = Mwidth/2
-Dheight = Cheight
+MDwidth = MCwidth
+MDheight = MCheight
+
+#lab
+#cells
+LCsize = 0
+#board
+LBwidth = 20
+LBheight = 20
