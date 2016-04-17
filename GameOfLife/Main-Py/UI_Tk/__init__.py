@@ -28,7 +28,7 @@ class GUI(tk.Frame):
         self.menubar = tk.Menu(self)
         self.master.config(menu=self.menubar)
         self.control = tk.Frame(self, background='black', width=config.MCwidth, height=config.MCheight)
-        self.details = tk.Frame(self, background='white', width=config.MDwidth, height=config.MDheight)
+        self.details = tk.Frame(self, background=config.MDbgCol, width=config.MDwidth, height=config.MDheight)
         self.lab = None
         
         self.control.grid(row=0, column=0, sticky='nsew')
@@ -36,6 +36,8 @@ class GUI(tk.Frame):
         
         self.grid()
         self.createWidgets()
+        
+        self.db = []
     
     def createWidgets(self):
         #menubar

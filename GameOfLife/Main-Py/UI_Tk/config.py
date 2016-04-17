@@ -17,6 +17,10 @@ MCheight = 500
 #details
 MDwidth = MCwidth
 MDheight = MCheight
+MDbgCol = 'white'
+MDbutCol = 'white'
+MDlblCol = 'white'
+MDbutSCol = 'red' #special
 
 #lab
 #cells

@@ -9,8 +9,12 @@ Usage: main file for Engine with standard-algorithm
 
 import math
 
-def Tick(size,data,count=None):
-    data,count = Resize(data,count)
+def Tick(data,count=None,size=None):
+    #returns data,count,shift
+    data,count,v,u = Resize(data,count,True)
+    shift = []
+    for i in range(len(v)):
+        shift.append(v[i]-u[i])
     dataN = []
     for y in range(len(data)):
         dataN.append([])
@@ -19,11 +23,14 @@ def Tick(size,data,count=None):
                 dataN[y].append(1)
             else:
                 dataN[y].append(0)
-    dataN,count = Resize(dataN,count)
-    dataN,count = Extendto(size,dataN,count)
-    return (dataN,count)
+    dataN,count,v,u = Resize(dataN,count,True)
+    for i in range(len(v)):
+        shift[i] += v[i]-u[i]
+    if size != None:
+        dataN,count = Extendto(size,dataN,count)
+    return (dataN,count,shift)
 
-def Resize(data,count=None):
+def Resize(data,count=None,retB=False):
     #returns resized data & count
     #generates count if None
     testY = []
@@ -31,32 +38,32 @@ def Resize(data,count=None):
     freeY = []
     freeX = []
     border = [0,0,0,0] #left,right,top,bottom
+    borderE = [0,0,0,0] #left,right,top,bottom
     #extend
     for y in [0,-1]:
         for x in range(len(data[y])):
             if data[y][x] == 1:
-                border[2+abs(y)] = 1
+                borderE[2+abs(y)] = 1
     for x in [0,-1]:
         for y in range(len(data)):
             if data[y][x] == 1:
-                border[abs(x)] = 1
-    data = Extend(border,data)
-    if 1 in border or count == None:
+                borderE[abs(x)] = 1
+    data = Extend(borderE,data)
+    if 1 in borderE or count == None:
         count = Count(data)
     #shrink
     for y in range(len(count)):
         testX = 0
         for x in range(len(count[y])):
-            if x == 0:
+            if y == 0:
                 testY.append(0)
             testX += count[y][x]
-            testY[y] += count[y][x]
+            testY[x] += count[y][x]
         if testX == 0:
             freeX.append(y)
     for i in range(len(testY)):
         if testY[i] == 0:
             freeY.append(i)
-    border = [0,0,0,0] #left,right,top,bottom
     for i in range(len(freeX)):
         if border[0] == freeX[i]:
             border[0] += 1
@@ -75,7 +82,10 @@ def Resize(data,count=None):
         for x in range(len(data[0])-border[0]-border[1]):
             dataN[y].append(data[y+border[0]][x+border[2]])
             countN[y].append(count[y+border[0]][x+border[2]])
-    return (dataN,countN)
+    if retB == True:
+        return (dataN,countN,borderE,border)
+    else:
+        return (dataN,countN)
 
 def Extendto(size,data,count=None):
     #auto-center

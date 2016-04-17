@@ -7,6 +7,9 @@ Package: Data
 Usage: Internal data-storage , classes
 '''
 
+import E_std.__init__ as Engine
+import E_std.compute as Compute
+
 class Pattern():
     '''
     General Pattern, toplevel-class
@@ -28,7 +31,7 @@ class Pattern():
         self.name = ''          #empty = unknown/unnamed
         self.num = 0            #id in type   
         self.author = ''        #discovered by, empty = not specified yet
-        self.committer = author    #put into database by, REQUIRED
+        self.committer = author #put into database by, REQUIRED
         self.description = ''   #purpose/usage
         self.trivia = ''        #history
         
@@ -36,7 +39,24 @@ class Pattern():
         self.period = None  #integer
         self.lengthA = []   #absolute length
         self.widthA  = []   #absolute width
-        self.offsetX = []   #offset/speed for origin in x-direction, right is +
-        self.offsetY = []   #offset/speed for origin in y-direction, up is +
+        self.lengthT = 0    #total length
+        self.widthT = 0     #total width
+        self.offsetX = []   #offset/speed for origin in x-direction, [left,right]
+        self.offsetY = []   #offset/speed for origin in y-direction, [up,down]
         self.data = []      #contains data, 2-dimensional-array
+        self.dataNum = []   #number of live cells
         self.count = []     #contains surrounding count, 2-dimensional-array, bounding box
+        self.countNum = []  #cells in bounding box
+    
+    def compute(self,data,count):
+        data,count = Engine.Resize(data,count)
+        self.data.append(data)
+        self.count.append(count)
+        self.dataNum = Compute.dataNum(self.data[-1])
+        self.countNum = Compute.countNum(self.count[-1])
+        ##find oscillator
+        #still-life
+        data,count,shift = Engine.Tick(self.data[0],self.count[0])
+        if data == self.data[0] and shift == [0,0,0,0]:
+            self.period = 0
+            self.type = 'Still-Life'
