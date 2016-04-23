@@ -6,6 +6,7 @@ Package: Data
 
 Usage: Internal data-storage , classes
 '''
+from itertools import izip
 
 import E_std.__init__ as Engine
 import E_std.compute as Compute
@@ -37,12 +38,13 @@ class Pattern():
         
         #gathered info , everything is packed into arrays with index of current period
         self.period = None  #integer
-        self.lengthA = []   #absolute length
+        self.heightA = []   #absolute height
         self.widthA  = []   #absolute width
-        self.lengthT = 0    #total length
+        self.heightT = 0    #total height
         self.widthT = 0     #total width
-        self.offsetX = []   #offset/speed for origin in x-direction, [left,right]
-        self.offsetY = []   #offset/speed for origin in y-direction, [up,down]
+        self.offsetX = []   #offset/speed for origin in x-direction, [left,right], absolute
+        self.offsetY = []   #offset/speed for origin in y-direction, [up,down], absolute
+        self.speed = [0,0]  #speed [x,y] for spaceships, sum of offsets, left&up is positive
         self.data = []      #contains data, 2-dimensional-array
         self.dataNum = []   #number of live cells
         self.count = []     #contains surrounding count, 2-dimensional-array, bounding box
@@ -52,11 +54,41 @@ class Pattern():
         data,count = Engine.Resize(data,count)
         self.data.append(data)
         self.count.append(count)
-        self.dataNum = Compute.dataNum(self.data[-1])
-        self.countNum = Compute.countNum(self.count[-1])
+        self.dataNum.append(Compute.dataNum(self.data[-1]))
+        self.countNum.append(Compute.countNum(self.count[-1]))
         ##find oscillator
-        #still-life
-        data,count,shift = Engine.Tick(self.data[0],self.count[0])
-        if data == self.data[0] and shift == [0,0,0,0]:
-            self.period = 0
-            self.type = 'Still-Life'
+        x = True
+        y = 0
+        while x:
+            data,count,shift = Engine.Tick(self.data[-1],self.count[-1])
+            if data in self.data:
+                pos = self.data.index(data)
+                if pos == len(self.data)-1 and shift == [0,0,0,0]:
+                    self.type = 'Still-Life'
+                    #is, or becomes still-life
+                    self.period = 0
+                    self.heightA = [len(data)]
+                    self.widthA = [len(data[0])]
+                    self.heightT = self.heightA[0]
+                    self.widthT = self.widthA[0]
+                    self.offsetX = [[0,0]]
+                    self.offsetY = [[0,0]]
+                    self.speed = [0,0]
+                    del self.data[:-1]
+                    del self.dataNum[:-1]
+                    del self.count[:-1]
+                    del self.countNum[:-1]
+                    x = False                   
+            else:
+                self.data.append(data)
+                self.count.append(count)
+                self.dataNum.append(Compute.dataNum(data))
+                self.countNum.append(Compute.countNum(count))
+                self.offsetX.append(shift[:2])
+                self.offsetY.append(shift[2:])
+                self.heightA.append(len(data))
+                self.widthA.append(len(data[0]))
+                y += 1
+            if y == 500 or data == []:
+                self.type = 'Error'
+                x = False

@@ -12,7 +12,7 @@ import math
 def Tick(data,count=None,size=None):
     #returns data,count,shift
     data,count,v,u = Resize(data,count,True)
-    shift = []
+    shift = [] #left,right,top,bottom
     for i in range(len(v)):
         shift.append(v[i]-u[i])
     dataN = []
@@ -23,7 +23,7 @@ def Tick(data,count=None,size=None):
                 dataN[y].append(1)
             else:
                 dataN[y].append(0)
-    dataN,count,v,u = Resize(dataN,count,True)
+    dataN,count,v,u = Resize(dataN,None,True)
     for i in range(len(v)):
         shift[i] += v[i]-u[i]
     if size != None:
