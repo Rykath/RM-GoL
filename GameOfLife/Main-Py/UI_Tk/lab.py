@@ -17,7 +17,10 @@ import UI_Tk.config as config
 def createWidgets(frame):
     size = config.LCsize
     frame.menubar = tk.Menu(frame)
+    frame.menucmd = tk.Menu(frame)
     frame.menubar.add_command(label='close',command=frame.destroy)
+    frame.menubar.add_cascade(label='command',menu=frame.menucmd)
+    frame.menucmd.add_command(label='tick & center',command=partial(tick,frame))
     frame.config(menu=frame.menubar)
     frame.board = []
     frame.data = []

@@ -6,7 +6,6 @@ Package: Data
 
 Usage: Internal data-storage , classes
 '''
-from itertools import izip
 
 import E_std.__init__ as Engine
 import E_std.compute as Compute
@@ -50,6 +49,36 @@ class Pattern():
         self.count = []     #contains surrounding count, 2-dimensional-array, bounding box
         self.countNum = []  #cells in bounding box
     
+    def mirror(self,X,Y):
+        #X, Y = True/False
+        if X:
+            for i in range(self.period):
+                for y in range(self.heightA[i]):
+                    self.data[i][y].reverse()
+                    self.count[i][y].reverse()
+                    self.offsetX[i].reverse()
+                    self.speed[0] *= -1
+        if Y:
+            for i in range(self.period):
+                self.data[i].reverse()
+                self.count[i].reverse()
+                self.offsetY[i].reverse()
+                self.speed[1] *= -1
+    
+    def rotate(self):
+        #rotates 90deg right, mirror double for rotating left
+        for i in range(self.period):
+            data = []
+            count = []
+            for x in range(self.widthA[i]):
+                data.append([])
+                count.append([])
+                for y in range(self.heightA[i]):
+                    data.append(self.data[i][x][y])
+                    count.append(self.count[i][x][y])
+            self.speed[i].reverse()
+        self.offsetX, self.offsetY = self.offsetY, self.offsetX                    
+    
     def compute(self,data,count):
         data,count = Engine.Resize(data,count)
         self.data.append(data)
@@ -66,7 +95,7 @@ class Pattern():
                 if pos == len(self.data)-1 and shift == [0,0,0,0]:
                     self.type = 'Still-Life'
                     #is, or becomes still-life
-                    self.period = 0
+                    self.period = 1
                     self.heightA = [len(data)]
                     self.widthA = [len(data[0])]
                     self.heightT = self.heightA[0]
@@ -78,7 +107,7 @@ class Pattern():
                     del self.dataNum[:-1]
                     del self.count[:-1]
                     del self.countNum[:-1]
-                    x = False                   
+                    x = False
             else:
                 self.data.append(data)
                 self.count.append(count)

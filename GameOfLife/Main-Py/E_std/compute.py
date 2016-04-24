@@ -21,3 +21,5 @@ def countNum(count):
             if count[y][x] > 0:
                 num += 1
     return num
+
+        
