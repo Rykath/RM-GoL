@@ -9,6 +9,7 @@ Usage: Internal data-storage , classes
 
 import E_std.__init__ as Engine
 import E_std.compute as Compute
+from operator import pos
 
 class Pattern():
     '''
@@ -85,19 +86,23 @@ class Pattern():
         self.count.append(count)
         self.dataNum.append(Compute.dataNum(self.data[-1]))
         self.countNum.append(Compute.countNum(self.count[-1]))
-        ##find oscillator
         x = True
         y = 0
         while x:
             data,count,shift = Engine.Tick(self.data[-1],self.count[-1])
             if data in self.data:
                 pos = self.data.index(data)
+                for i in range(len(self.data)-pos-1):
+                    shift[0] += self.offsetX[i+pos][0]
+                    shift[1] += self.offsetX[i+pos][1]
+                    shift[2] += self.offsetY[i+pos][0]
+                    shift[3] += self.offsetY[i+pos][1]
                 if pos == len(self.data)-1 and shift == [0,0,0,0]:
                     self.type = 'Still-Life'
                     #is, or becomes still-life
                     self.period = 1
-                    self.heightA = [len(data)]
-                    self.widthA = [len(data[0])]
+                    self.heightA = [len(self.data[-1])]
+                    self.widthA = [len(self.data[-1][0])]
                     self.heightT = self.heightA[0]
                     self.widthT = self.widthA[0]
                     self.offsetX = [[0,0]]
@@ -107,6 +112,22 @@ class Pattern():
                     del self.dataNum[:-1]
                     del self.count[:-1]
                     del self.countNum[:-1]
+                    x = False
+                elif shift == [0,0,0,0]:
+                    self.type = 'Oscillator'
+                    #is, or becomes oscillator
+                    self.period = len(self.data)-pos
+                    del self.data[:pos]
+                    del self.dataNum[:pos]
+                    del self.count[:pos]
+                    del self.countNum[:pos]
+                    del self.heightA[:pos]
+                    del self.widthA[:pos]
+                    del self.offsetX[:pos]
+                    del self.offsetY[:pos]
+                    self.speed = [0,0]
+                    self.heightT = max(self.heightA)
+                    self.widthT = max(self.widthA)
                     x = False
             else:
                 self.data.append(data)

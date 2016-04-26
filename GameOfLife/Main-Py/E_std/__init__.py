@@ -64,15 +64,15 @@ def Resize(data,count=None,retB=False):
     for i in range(len(testY)):
         if testY[i] == 0:
             freeY.append(i)
-    for i in range(len(freeX)):
-        if border[0] == freeX[i]:
-            border[0] += 1
-        if len(data[0])-border[1]-1 == freeX[-1*(i+1)]:
-            border[1] += 1
     for i in range(len(freeY)):
-        if border[2] == freeY[i]:
+        if border[0] == freeY[i]:
+            border[0] += 1
+        if len(data[0])-border[1]-1 == freeY[-1*(i+1)]:
+            border[1] += 1
+    for i in range(len(freeX)):
+        if border[2] == freeX[i]:
             border[2] += 1
-        if len(data)-border[3]-1 == freeY[-1*(i+1)]:
+        if len(data)-border[3]-1 == freeX[-1*(i+1)]:
             border[3] += 1
     dataN = []
     countN = []
@@ -80,8 +80,8 @@ def Resize(data,count=None,retB=False):
         dataN.append([])
         countN.append([])
         for x in range(len(data[0])-border[0]-border[1]):
-            dataN[y].append(data[y+border[0]][x+border[2]])
-            countN[y].append(count[y+border[0]][x+border[2]])
+            dataN[y].append(data[y+border[2]][x+border[0]])
+            countN[y].append(count[y+border[2]][x+border[0]])
     if retB == True:
         return (dataN,countN,borderE,border)
     else:

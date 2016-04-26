@@ -64,7 +64,6 @@ def compute(frame):
     test = False
     data,_ = Engine.Resize(frame.lab.data)
     for i in frame.db:
-        #print(data,i.data)
         if data in i.data:
             test = True
     if test == False:
