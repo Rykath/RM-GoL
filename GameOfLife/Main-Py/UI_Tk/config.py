@@ -26,5 +26,5 @@ MDbutSCol = 'red' #special
 #cells
 LCsize = 0
 #board
-LBwidth = 20
-LBheight = 20
+LBwidth = 5
+LBheight = 5

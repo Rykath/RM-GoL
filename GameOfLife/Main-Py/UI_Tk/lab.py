@@ -20,7 +20,11 @@ def createWidgets(frame):
     frame.menucmd = tk.Menu(frame)
     frame.menubar.add_command(label='close',command=frame.destroy)
     frame.menubar.add_cascade(label='command',menu=frame.menucmd)
-    frame.menucmd.add_command(label='tick & center',command=partial(tick,frame))
+    frame.menucmd.add_command(label='tick & center',command=partial(cmdTick,frame))
+    frame.menucmd.add_command(label='rotate clock-wise',command=partial(cmdRotate,frame.parent,'cw'))
+    frame.menucmd.add_command(label='rotate counter-clock-wise',command=partial(cmdRotate,frame.parent,'ccw'))
+    frame.menucmd.add_command(label='mirror horizontal',command=partial(cmdMirror,frame.parent,'x'))
+    frame.menucmd.add_command(label='mirror vertical',command=partial(cmdMirror,frame.parent,'y'))
     frame.config(menu=frame.menubar)
     frame.board = []
     frame.data = []
@@ -33,8 +37,9 @@ def createWidgets(frame):
             frame.data[y].append(0)
 
 def createDetails(frame):
+    #frame: GUI
     del frame.details.content[:]
-    frame.details.content.append(tk.Button(frame.details,text='tick & center',bg=config.MDbutCol,height=0,width=0,command=partial(tick,frame.lab)))
+    frame.details.content.append(tk.Button(frame.details,text='tick & center',bg=config.MDbutCol,height=0,width=0,command=partial(cmdTick,frame.lab)))
     frame.details.content[-1].grid(row=0,column=0,sticky='nsew',padx=1,pady=1)
     frame.details.content.append(tk.Button(frame.details,text='compute',bg=config.MDbutSCol,height=0,width=0,command=partial(compute,frame)))
     frame.details.content[-1].grid(row=1,column=0,columnspan=2,sticky='nsew',padx=1,pady=1)
@@ -48,6 +53,7 @@ def cellClicked(frame,x,y):
     updateGrid(frame)
 
 def updateGrid(frame):
+    #frame: GUI.lab
     for y in range(len(frame.board)):
         for x in range(len(frame.board[y])):
             if frame.data[y][x] == 0:
@@ -56,21 +62,38 @@ def updateGrid(frame):
                 frame.board[y][x].config(bg='black',fg='white')
             frame.board[y][x].config(text=frame.count[y][x])
 
-def tick(frame):
+def cmdTick(frame):
     frame.data,frame.count,_ = Engine.Tick(frame.data,frame.count,[config.LBheight,config.LBwidth])
     updateGrid(frame)
+   
+def cmdRotate(frame,direction):
+    #frame: GUI
+    if direction == 'cw':
+        frame.db[frame.lab.active].rotate()
+        frame.db[frame.lab.active].mirror(True,False)
+    elif direction == 'ccw':
+        frame.db[frame.lab.active].rotate()
+        frame.db[frame.lab.active].mirror(False,True)
+    updateLab(frame)
+    updateGrid(frame.lab)
 
-def compute(frame):
-    test = False
-    data,_ = Engine.Resize(frame.lab.data)
-    for i in frame.db:
-        if data in i.data:
-            test = True
-            frame.lab.active = frame.db.index(i)
-    if test == False:
-        frame.db.append(Data.Pattern(len(frame.db),Settings.user))
-        frame.db[-1].compute(frame.lab.data,frame.lab.count)
-        frame.lab.active = -1
+def cmdMirror(frame,direction):
+    #frame: GUI
+    if direction == 'x':
+        frame.db[frame.lab.active].mirror(True,False)
+    elif direction == 'y':
+        frame.db[frame.lab.active].mirror(False,True)
+    updateLab(frame)
+    updateGrid(frame.lab)
+    
+def updateLab(frame):
+    #frame: GUI
+    #frame.lab.data,frame.lab.count = Engine.Extendto([config.LBwidth,config.LBheight],frame.db[frame.lab.active].data[-1],frame.db[frame.lab.active].count[-1])
+    frame.lab.data,frame.lab.count = frame.db[frame.lab.active].data[-1],frame.db[frame.lab.active].count[-1]
+    del frame.details.content[:]
+    #offset-top: 2 rows
+    #width: 2 columns
+    #down to: row 8
     frame.details.content.append(tk.Label(frame.details,text='Full-ID: '+str(frame.db[frame.lab.active].ID),bg=config.MDlblCol))
     frame.details.content[-1].grid(row=2,column=0,sticky='nsew',padx=1,pady=1)
     frame.details.content.append(tk.Label(frame.details,text='Type: '+frame.db[frame.lab.active].type,bg=config.MDlblCol))
@@ -89,7 +112,25 @@ def compute(frame):
     frame.details.content[-1].grid(row=7,column=0,sticky='nsew',padx=1,pady=1)
     frame.details.content.append(tk.Label(frame.details,text='Width: '+str(frame.db[frame.lab.active].widthT),bg=config.MDlblCol))
     frame.details.content[-1].grid(row=7,column=1,sticky='nsew',padx=1,pady=1)
-    frame.details.content.append(tk.Label(frame.details,text='Author: '+frame.db[frame.lab.active].author,bg=config.MDlblCol))
+    frame.details.content.append(tk.Label(frame.details,text='Speed-X: '+str(frame.db[frame.lab.active].speed[0]),bg=config.MDlblCol))
     frame.details.content[-1].grid(row=8,column=0,sticky='nsew',padx=1,pady=1)
-    frame.details.content.append(tk.Label(frame.details,text='Committer: '+frame.db[frame.lab.active].committer,bg=config.MDlblCol))
+    frame.details.content.append(tk.Label(frame.details,text='Speed-Y: '+str(frame.db[frame.lab.active].speed[1]),bg=config.MDlblCol))
     frame.details.content[-1].grid(row=8,column=1,sticky='nsew',padx=1,pady=1)
+    frame.details.content.append(tk.Label(frame.details,text='Author: '+frame.db[frame.lab.active].author,bg=config.MDlblCol))
+    frame.details.content[-1].grid(row=9,column=0,sticky='nsew',padx=1,pady=1)
+    frame.details.content.append(tk.Label(frame.details,text='Committer: '+frame.db[frame.lab.active].committer,bg=config.MDlblCol))
+    frame.details.content[-1].grid(row=9,column=1,sticky='nsew',padx=1,pady=1)
+
+def compute(frame):
+    #frame: GUI
+    test = False
+    data,_ = Engine.Resize(frame.lab.data)
+    for i in frame.db:
+        if data in i.data:
+            test = True
+            frame.lab.active = frame.db.index(i)
+    if test == False:
+        frame.db.append(Data.Pattern(len(frame.db),Settings.user))
+        frame.db[-1].compute(frame.lab.data,frame.lab.count)
+        frame.lab.active = -1
+    updateLab(frame)

@@ -58,16 +58,16 @@ class Pattern():
                     self.data[i][y].reverse()
                     self.count[i][y].reverse()
                     self.offsetX[i].reverse()
-                    self.speed[0] *= -1
+            self.speed[0] *= -1
         if Y:
             for i in range(self.period):
                 self.data[i].reverse()
                 self.count[i].reverse()
                 self.offsetY[i].reverse()
-                self.speed[1] *= -1
+            self.speed[1] *= -1
     
     def rotate(self):
-        #rotates 90deg right, mirror double for rotating left
+        #actually doesn't rotate but mirrors around diagonal-axis
         for i in range(self.period):
             data = []
             count = []
@@ -75,9 +75,11 @@ class Pattern():
                 data.append([])
                 count.append([])
                 for y in range(self.heightA[i]):
-                    data.append(self.data[i][x][y])
-                    count.append(self.count[i][x][y])
-            self.speed[i].reverse()
+                    data[x].append(self.data[i][y][x])
+                    count[x].append(self.count[i][y][x])
+            self.data[i] = data
+            self.count[i] = count
+        self.speed.reverse()
         self.offsetX, self.offsetY = self.offsetY, self.offsetX                    
     
     def compute(self,data,count):
