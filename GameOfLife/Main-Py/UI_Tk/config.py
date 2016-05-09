@@ -26,5 +26,5 @@ MDbutSCol = 'red' #special
 #cells
 LCsize = 0
 #board
-LBwidth = 5
-LBheight = 5
+LBwidth = 6 #should always be an even number!
+LBheight = 6 #should always be an even number!

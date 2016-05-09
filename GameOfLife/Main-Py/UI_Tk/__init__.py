@@ -57,6 +57,8 @@ class GUI(tk.Frame):
             self.lab.wm_title('RM-GoL Laboratory')
             self.lab.parent = self
             self.lab.active = None
+            self.lab.Bdimension = [config.LBwidth,config.LBheight]
+            self.lab.Bborder = [config.LBwidth/2,config.LBwidth/2,config.LBheight/2,config.LBheight/2]
             lab.createWidgets(self.lab)
             lab.cellClicked(self.lab,int(config.LBwidth/2),int(config.LBheight/2))
             lab.updateGrid(self.lab)

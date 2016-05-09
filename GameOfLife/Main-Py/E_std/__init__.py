@@ -88,6 +88,8 @@ def Resize(data,count=None,retB=False):
         return (dataN,countN)
 
 def Extendto(size,data,count=None):
+    #!! BUGGED
+    #!! outdated (replaced by redrawGrid)
     #auto-center
     border = [0,0,0,0]
     if len(data[0]) < size[0]:
