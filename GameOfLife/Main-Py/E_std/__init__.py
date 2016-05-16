@@ -8,6 +8,7 @@ Usage: main file for Engine with standard-algorithm
 '''
 
 import math
+import copy
 
 def Tick(data,count=None,size=None):
     #returns data,count,shift
@@ -100,9 +101,14 @@ def Extendto(size,data,count=None):
         border[3] = int(math.floor((size[1]-len(data))/2)+(size[1]-len(data))%2)
     return Extend(border,data,count)
 
-def Extend(border,data,count=None):
+def Extend(border,dataIn,countIn=None):
     #Extends data & count
     #border=[left,right,top,bottom] all positive (or zero)
+    data = copy.deepcopy(dataIn)
+    if countIn != None:
+        count = copy.deepcopy(countIn)
+    else:
+        count = None
     if border[0] != 0:
         for y in range(len(data)):
             for _ in range(border[0]):

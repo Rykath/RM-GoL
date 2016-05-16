@@ -15,16 +15,42 @@ import Data.internal as Data
 import UI_Tk.config as config
 
 def createWidgets(frame):
+    #frame: GUI.lab
     size = config.LCsize
     frame.menubar = tk.Menu(frame)
-    frame.menucmd = tk.Menu(frame)
+    frame.menubar.cmd = tk.Menu(frame)
+    frame.menubar.cmd.rot = tk.Menu(frame)
+    frame.menubar.cmd.mir = tk.Menu(frame)
+    frame.menubar.cmd.exp = tk.Menu(frame)
+    frame.menubar.cmd.ret = tk.Menu(frame)
+    frame.menubar.cmd.mov = tk.Menu(frame)
     frame.menubar.add_command(label='close',command=frame.destroy)
-    frame.menubar.add_cascade(label='command',menu=frame.menucmd)
-    frame.menucmd.add_command(label='tick & center',command=partial(cmdTick,frame))
-    frame.menucmd.add_command(label='rotate clock-wise',command=partial(cmdRotate,frame.parent,'cw'))
-    frame.menucmd.add_command(label='rotate counter-clock-wise',command=partial(cmdRotate,frame.parent,'ccw'))
-    frame.menucmd.add_command(label='mirror horizontal',command=partial(cmdMirror,frame.parent,'x'))
-    frame.menucmd.add_command(label='mirror vertical',command=partial(cmdMirror,frame.parent,'y'))
+    frame.menubar.add_cascade(label='command',menu=frame.menubar.cmd)
+    frame.menubar.cmd.add_command(label='tick & center',command=partial(cmdTick,frame))
+    frame.menubar.cmd.add_cascade(label='rotate',menu=frame.menubar.cmd.rot)
+    frame.menubar.cmd.rot.add_command(label='rotate clock-wise'         ,command=partial(cmdRotate,frame.parent,'cw'))
+    frame.menubar.cmd.rot.add_command(label='rotate counter-clock-wise' ,command=partial(cmdRotate,frame.parent,'ccw'))
+    frame.menubar.cmd.add_cascade(label='mirror',menu=frame.menubar.cmd.mir)
+    frame.menubar.cmd.mir.add_command(label='mirror horizontal' ,command=partial(cmdMirror,frame.parent,'x'))
+    frame.menubar.cmd.mir.add_command(label='mirror vertical'   ,command=partial(cmdMirror,frame.parent,'y'))
+    frame.menubar.cmd.add_cascade(label='expand',menu=frame.menubar.cmd.exp)
+    frame.menubar.cmd.exp.add_command(label='left'  ,command=partial(cmdMove,frame.parent,left=1))
+    frame.menubar.cmd.exp.add_command(label='right' ,command=partial(cmdMove,frame.parent,right=1))
+    frame.menubar.cmd.exp.add_command(label='up'    ,command=partial(cmdMove,frame.parent,up=1))
+    frame.menubar.cmd.exp.add_command(label='down'  ,command=partial(cmdMove,frame.parent,down=1))
+    frame.menubar.cmd.exp.add_command(label='all sides',command=partial(cmdMove,frame.parent,four=1))
+    frame.menubar.cmd.add_cascade(label='retract',menu=frame.menubar.cmd.ret)
+    frame.menubar.cmd.ret.add_command(label='left'  ,command=partial(cmdMove,frame.parent,left=-1))
+    frame.menubar.cmd.ret.add_command(label='right' ,command=partial(cmdMove,frame.parent,right=-1))
+    frame.menubar.cmd.ret.add_command(label='up'    ,command=partial(cmdMove,frame.parent,up=-1))
+    frame.menubar.cmd.ret.add_command(label='down'  ,command=partial(cmdMove,frame.parent,down=-1))
+    frame.menubar.cmd.ret.add_command(label='all sides',command=partial(cmdMove,frame.parent,four=-1))
+    frame.menubar.cmd.ret.add_command(label='full shrink',command=partial(cmdResize,frame.parent))
+    frame.menubar.cmd.add_cascade(label='move',menu=frame.menubar.cmd.mov)
+    frame.menubar.cmd.mov.add_command(label='left'  ,command=partial(cmdMove,frame.parent,left=-1,right=1))
+    frame.menubar.cmd.mov.add_command(label='right' ,command=partial(cmdMove,frame.parent,right=-1,left=1))
+    frame.menubar.cmd.mov.add_command(label='up'    ,command=partial(cmdMove,frame.parent,up=-1,down=1))
+    frame.menubar.cmd.mov.add_command(label='down'  ,command=partial(cmdMove,frame.parent,down=-1,up=1))
     frame.config(menu=frame.menubar)
     frame.board = []
     frame.data = []
@@ -54,8 +80,8 @@ def cellClicked(frame,x,y):
 
 def updateGrid(frame):
     #frame: GUI.lab
-    for y in range(len(frame.board)):
-        for x in range(len(frame.board[y])):
+    for y in range(frame.Bdimension[1]):
+        for x in range(frame.Bdimension[0]):
             if frame.data[y][x] == 0:
                 frame.board[y][x].config(bg='white',fg='black')
             else:
@@ -70,31 +96,34 @@ def redrawGrid(frame):
         width += frame.db[frame.lab.active].widthT 
         height += frame.db[frame.lab.active].heightT
     if width > frame.lab.Bdimension[0]:
-        for y in range(len(frame.lab.board)):
+        for y in range(frame.lab.Bdimension[1]):
             for x in range(frame.lab.Bdimension[0],width):
-                frame.lab.board[y].append(tk.Button(frame.lab,bg='white',width=config.LCsize,height=config.LCsize,padx=2,pady=0,command=partial(cellClicked,frame.lab,x,y)))
-                frame.lab.board[y][x].grid(row=y,column=x,padx=0,pady=0)
-                frame.lab.data[y].append(0)
+                if x >= len(frame.lab.board[y]):
+                    frame.lab.board[y].append(tk.Button(frame.lab,bg='white',width=config.LCsize,height=config.LCsize,padx=2,pady=0,command=partial(cellClicked,frame.lab,x,y)))
+                if y < height:
+                    frame.lab.board[y][x].grid(row=y,column=x,padx=0,pady=0)
     elif width < frame.lab.Bdimension[0]:
-        for y in range(len(frame.lab.board)):
-            del frame.lab.board[y][width:]
-            del frame.lab.data[y][width:]                
+        for y in range(frame.lab.Bdimension[1]):
+            for x in range(width,frame.lab.Bdimension[0]):
+                frame.lab.board[y][x].grid_remove()
     if height > frame.lab.Bdimension[1]:
         for y in range(frame.lab.Bdimension[1],height):
-            frame.lab.board.append([])
-            frame.lab.data.append([])
-            for x in range(len(frame.lab.board[0])):
-                frame.lab.board[y].append(tk.Button(frame.lab,bg='white',width=config.LCsize,height=config.LCsize,padx=2,pady=0,command=partial(cellClicked,frame.lab,x,y)))
+            if y >= len(frame.lab.board):
+                frame.lab.board.append([])
+                for x in range(width):
+                    frame.lab.board[y].append(tk.Button(frame.lab,bg='white',width=config.LCsize,height=config.LCsize,padx=2,pady=0,command=partial(cellClicked,frame.lab,x,y)))
+            for x in range(width):
                 frame.lab.board[y][x].grid(row=y,column=x,padx=0,pady=0)
-                frame.lab.data[y].append(0)
     elif height < frame.lab.Bdimension[1]:
-        del frame.lab.board[height:]
-        del frame.lab.data[height:]
+        for y in range(height,frame.lab.Bdimension[1]):
+            for x in range(width):
+                frame.lab.board[y][x].grid_remove()
     frame.lab.Bdimension = [width,height]
     frame.lab.data,frame.lab.count = Engine.Extend(frame.lab.Bborder,frame.db[frame.lab.active].data[-1],frame.db[frame.lab.active].count[-1])
     updateGrid(frame.lab) 
 
 def cmdTick(frame):
+    #frame: GUI.lab
     frame.data,frame.count,_ = Engine.Tick(frame.data,frame.count)
     redrawGrid(frame.parent)
    
@@ -115,6 +144,34 @@ def cmdMirror(frame,direction):
     elif direction == 'y':
         frame.db[frame.lab.active].mirror(False,True)
     updateLab(frame)
+
+def cmdResize(frame,left=0,right=0,up=0,down=0,border=[],four=0):
+    #frame: GUI
+    if len(border) != 4:
+        if four != 0:
+            border = [four,four,four,four]
+        else:
+            border = [left,right,up,down]
+    for i in border:
+        if i < 0:
+            i = 0
+    for i in range(len(border)):
+        frame.lab.Bborder[i] = border[i]
+    redrawGrid(frame)
+
+def cmdMove(frame,left=0,right=0,up=0,down=0,border=[],four=0):
+    #frame: GUI
+    if len(border) != 4:
+        if four != 0:
+            border = [four,four,four,four]
+        else:
+            border = [left,right,up,down]
+    for i in range(len(border)):
+        if frame.lab.Bborder[i] + border[i] >= 0:
+            frame.lab.Bborder[i] += border[i]
+        else:
+            frame.lab.Bborder[i] = 0
+    redrawGrid(frame)
     
 def updateLab(frame):
     #frame: GUI
