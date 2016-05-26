@@ -10,7 +10,7 @@ class Core():
     
     def __init__(self):
         #Database
-        self.db = []
+        self.Ddb = [] #database
         #Laboratory
         self.Lcp = None #current pattern
 
@@ -21,5 +21,5 @@ if __name__ == '__main__':
     
     core = Core()
     
-    Wcontrol = UI.GUI()
+    Wcontrol = UI.GUI(core=core)
     Wcontrol.mainloop()

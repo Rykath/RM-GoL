@@ -10,6 +10,8 @@ Usage: main file for Engine with standard-algorithm
 import math
 import copy
 
+import Main.utilities as Utils
+
 def Tick(data,count=None,size=None):
     #returns data,count,shift
     data,count,v,u = Resize(data,count,True)
@@ -49,7 +51,7 @@ def Resize(data,count=None,retB=False):
         for y in range(len(data)):
             if data[y][x] == 1:
                 borderE[abs(x)] = 1
-    data = Extend(borderE,data)
+    data = Extend(Utils.Border(array=borderE),data)
     if 1 in borderE or count == None:
         count = Count(data)
     #shrink
@@ -103,26 +105,26 @@ def Extendto(size,data,count=None):
 
 def Extend(border,dataIn,countIn=None):
     #Extends data & count
-    #border=[left,right,top,bottom] all positive (or zero)
+    #border
     data = copy.deepcopy(dataIn)
     if countIn != None:
         count = copy.deepcopy(countIn)
     else:
         count = None
-    if border[0] != 0:
+    if border.left != 0:
         for y in range(len(data)):
-            for _ in range(border[0]):
+            for _ in range(border.left):
                 data[y].insert(0,0)
                 if count != None:
                     count[y].insert(0,0)
-    if border[1] != 0:
+    if border.right != 0:
         for y in range(len(data)):
-            for _ in range(border[1]):
+            for _ in range(border.right):
                 data[y].append(0)
                 if count != None:
                     count[y].append(0)
-    if border[2] != 0:
-        for _ in range(border[2]):
+    if border.up != 0:
+        for _ in range(border.up):
             data.insert(0,[])
             if count != None:
                 count.insert(0,[])
@@ -130,8 +132,8 @@ def Extend(border,dataIn,countIn=None):
                 data[0].append(0)
                 if count != None:
                     count[0].append(0)
-    if border[3] != 0:
-        for _ in range(border[3]):
+    if border.down != 0:
+        for _ in range(border.down):
             data.append([])
             if count != None:
                 count.append([])

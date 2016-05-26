@@ -12,6 +12,7 @@ import Tkinter as tk
 
 import UI_Tk.config as config
 import UI_Tk.lab as lab
+import Main.utilities as Utils
 
 '''
 UI_Tk uses a simple 2dimensional-array to store data
@@ -19,8 +20,10 @@ UI_Tk uses a simple 2dimensional-array to store data
 
 class GUI(tk.Frame):
     
-    def __init__(self, master=None):
+    def __init__(self, core, master=None):
         tk.Frame.__init__(self, master)
+        
+        self.core = core
         
         self.master.title('RM-GoL ControlPanel')
         self.master.resizable(width=False,height=False)
@@ -36,8 +39,6 @@ class GUI(tk.Frame):
         
         self.grid()
         self.createWidgets()
-        
-        self.db = []
     
     def createWidgets(self):
         #menubar
@@ -56,9 +57,9 @@ class GUI(tk.Frame):
             self.lab.resizable(width=False,height=False)
             self.lab.wm_title('RM-GoL Laboratory')
             self.lab.parent = self
-            self.lab.active = None
+            self.lab.active = 0
             self.lab.Bdimension = [config.LBwidth,config.LBheight]
-            self.lab.Bborder = [config.LBwidth/2,config.LBwidth/2,config.LBheight/2,config.LBheight/2]
+            self.lab.Bborder = Utils.Border(width=config.LBwidth,height=config.LBheight)
             lab.createWidgets(self.lab)
             lab.cellClicked(self.lab,int(config.LBwidth/2),int(config.LBheight/2))
             lab.updateGrid(self.lab)

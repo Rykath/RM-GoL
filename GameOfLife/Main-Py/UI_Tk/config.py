@@ -25,6 +25,12 @@ MDbutSCol = 'red' #special
 #lab
 #cells
 LCsize = 0
+LCaBgCol = 'black' #alive cell
+LCaFgCol = 'white'
+LCbBgCol = 'grey' #bounding-box cell
+LCbFgCol = 'black'
+LCdBgCol = 'white' #dead cell
+LCdFgCol = 'black'
 #board
 LBwidth = 6 #should always be an even number!
 LBheight = 6 #should always be an even number!

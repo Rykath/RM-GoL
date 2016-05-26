@@ -29,6 +29,8 @@ def createWidgets(frame):
     frame.menubar.add_command(label='close',command=frame.destroy)
     frame.menubar.add_cascade(label='command',menu=frame.menubar.cmd)
     frame.menubar.cmd.add_command(label='tick & center',command=partial(cmdTick,frame))
+    frame.menubar.cmd.add_command(label='next state',command=partial(cmdState,frame.parent,1))
+    frame.menubar.cmd.add_command(label='previous state',command=partial(cmdState,frame.parent,-1))
     frame.menubar.cmd.add_cascade(label='rotate',menu=frame.menubar.cmd.rot)
     frame.menubar.cmd.rot.add_command(label='rotate clock-wise'         ,command=partial(cmdRotate,frame.parent,'cw'))
     frame.menubar.cmd.rot.add_command(label='rotate counter-clock-wise' ,command=partial(cmdRotate,frame.parent,'ccw'))
@@ -84,19 +86,21 @@ def updateGrid(frame):
     #frame: GUI.lab
     for y in range(frame.Bdimension[1]):
         for x in range(frame.Bdimension[0]):
-            if frame.data[y][x] == 0:
-                frame.board[y][x].config(bg='white',fg='black')
+            if frame.data[y][x] == 1:
+                frame.board[y][x].config(bg=config.LCaBgCol,fg=config.LCaFgCol,activebackground=config.LCaBgCol,activeforeground=config.LCaFgCol)
+            elif frame.count[y][x] > 0:
+                frame.board[y][x].config(bg=config.LCbBgCol,fg=config.LCbFgCol,activebackground=config.LCbBgCol,activeforeground=config.LCbFgCol)
             else:
-                frame.board[y][x].config(bg='black',fg='white')
+                frame.board[y][x].config(bg=config.LCdBgCol,fg=config.LCdFgCol,activebackground=config.LCdBgCol,activeforeground=config.LCdFgCol)
             frame.board[y][x].config(text=frame.count[y][x])
 
 def redrawGrid(frame):
     #frame: GUI
-    width = frame.lab.Bborder[0] + frame.lab.Bborder[1]
-    height = frame.lab.Bborder[2] + frame.lab.Bborder[3]
-    if frame.lab.active != None:
-        width += frame.db[frame.lab.active].widthT 
-        height += frame.db[frame.lab.active].heightT
+    width = frame.lab.Bborder.width
+    height = frame.lab.Bborder.height
+    if frame.core.Lcp != None:
+        width += frame.core.Lcp.widthT 
+        height += frame.core.Lcp.heightT
     if width > frame.lab.Bdimension[0]:
         for y in range(frame.lab.Bdimension[1]):
             for x in range(frame.lab.Bdimension[0],width):
@@ -121,7 +125,8 @@ def redrawGrid(frame):
             for x in range(width):
                 frame.lab.board[y][x].grid_remove()
     frame.lab.Bdimension = [width,height]
-    frame.lab.data,frame.lab.count = Engine.Extend(frame.lab.Bborder,frame.db[frame.lab.active].data[-1],frame.db[frame.lab.active].count[-1])
+    frame.lab.data,frame.lab.count = Engine.Extend(frame.lab.Bborder,frame.core.Lcp.data[frame.lab.active],frame.core.Lcp.count[frame.lab.active])
+    frame.lab.data,frame.lab.count = Engine.Extend(Utils.Border(dimension=[frame.core.Lcp.widthT,frame.core.Lcp.heightT]).add(dimension=[frame.core.Lcp.widthA[frame.lab.active],frame.core.Lcp.heightA[frame.lab.active]],invert=True),frame.lab.data,frame.lab.count)
     updateGrid(frame.lab) 
 
 def cmdTick(frame):
@@ -131,12 +136,12 @@ def cmdTick(frame):
    
 def cmdRotate(frame,direction):
     #frame: GUI
-    Compute.rotate(frame.db[frame.lab.active],direction)
+    Compute.rotate(frame.core.Lcp,direction)
     updateLab(frame)
 
 def cmdMirror(frame,direction):
     #frame: GUI
-    Compute.mirror(frame.db[frame.lab.active],direction)
+    Compute.mirror(frame.core.Lcp,direction)
     updateLab(frame)
 
 def cmdResize(frame,border):
@@ -148,53 +153,63 @@ def cmdMove(frame,border):
     #frame: GUI
     Compute.move(frame,border)
     redrawGrid(frame)
+
+def cmdState(frame,amount):
+    #frame: GUI
+    frame.lab.active += amount
+    while frame.lab.active >= frame.core.Lcp.period:
+        frame.lab.active -= frame.core.Lcp.period
+    while frame.lab.active < 0:
+        frame.lab.active += frame.core.Lcp.period
+    updateLab(frame)
     
 def updateLab(frame):
     #frame: GUI
-    #frame.lab.data,frame.lab.count = Engine.Extendto([config.LBwidth,config.LBheight],frame.db[frame.lab.active].data[-1],frame.db[frame.lab.active].count[-1])
-    #frame.lab.data,frame.lab.count = frame.db[frame.lab.active].data[-1],frame.db[frame.lab.active].count[-1]
     redrawGrid(frame)
     del frame.details.content[:]
     #offset-top: 2 rows
     #width: 2 columns
     #down to: row 8
-    frame.details.content.append(tk.Label(frame.details,text='Full-ID: '+str(frame.db[frame.lab.active].ID),bg=config.MDlblCol))
+    frame.details.content.append(tk.Label(frame.details,text='Full-ID: '+str(frame.core.Lcp.ID),bg=config.MDlblCol))
     frame.details.content[-1].grid(row=2,column=0,sticky='nsew',padx=1,pady=1)
-    frame.details.content.append(tk.Label(frame.details,text='Type: '+frame.db[frame.lab.active].type,bg=config.MDlblCol))
+    frame.details.content.append(tk.Label(frame.details,text='Type: '+frame.core.Lcp.type,bg=config.MDlblCol))
     frame.details.content[-1].grid(row=3,column=0,sticky='nsew',padx=1,pady=1)
-    frame.details.content.append(tk.Label(frame.details,text='Type-ID: '+str(frame.db[frame.lab.active].num),bg=config.MDlblCol))
+    frame.details.content.append(tk.Label(frame.details,text='Type-ID: '+str(frame.core.Lcp.num),bg=config.MDlblCol))
     frame.details.content[-1].grid(row=3,column=1,sticky='nsew',padx=1,pady=1)
-    frame.details.content.append(tk.Label(frame.details,text='Name: '+frame.db[frame.lab.active].name,bg=config.MDlblCol))
+    frame.details.content.append(tk.Label(frame.details,text='Name: '+frame.core.Lcp.name,bg=config.MDlblCol))
     frame.details.content[-1].grid(row=4,column=0,sticky='nsew',padx=1,pady=1,columnspan=2)
-    frame.details.content.append(tk.Label(frame.details,text='Period: '+str(frame.db[frame.lab.active].period),bg=config.MDlblCol))
+    frame.details.content.append(tk.Label(frame.details,text='Period: '+str(frame.core.Lcp.period),bg=config.MDlblCol))
     frame.details.content[-1].grid(row=5,column=0,sticky='nsew',padx=1,pady=1)
-    frame.details.content.append(tk.Label(frame.details,text='Live Cells: '+str(frame.db[frame.lab.active].dataNum[0]),bg=config.MDlblCol))
+    frame.details.content.append(tk.Label(frame.details,text='Live Cells: '+str(frame.core.Lcp.dataNum[frame.lab.active]),bg=config.MDlblCol))
     frame.details.content[-1].grid(row=6,column=0,sticky='nsew',padx=1,pady=1)
-    frame.details.content.append(tk.Label(frame.details,text='Bounding Box: '+str(frame.db[frame.lab.active].countNum[0]),bg=config.MDlblCol))
+    frame.details.content.append(tk.Label(frame.details,text='Bounding Box: '+str(frame.core.Lcp.countNum[frame.lab.active]),bg=config.MDlblCol))
     frame.details.content[-1].grid(row=6,column=1,sticky='nsew',padx=1,pady=1)
-    frame.details.content.append(tk.Label(frame.details,text='Height: '+str(frame.db[frame.lab.active].heightT),bg=config.MDlblCol))
+    frame.details.content.append(tk.Label(frame.details,text='Height: '+str(frame.core.Lcp.heightT),bg=config.MDlblCol))
     frame.details.content[-1].grid(row=7,column=0,sticky='nsew',padx=1,pady=1)
-    frame.details.content.append(tk.Label(frame.details,text='Width: '+str(frame.db[frame.lab.active].widthT),bg=config.MDlblCol))
+    frame.details.content.append(tk.Label(frame.details,text='Width: '+str(frame.core.Lcp.widthT),bg=config.MDlblCol))
     frame.details.content[-1].grid(row=7,column=1,sticky='nsew',padx=1,pady=1)
-    frame.details.content.append(tk.Label(frame.details,text='Speed-X: '+str(frame.db[frame.lab.active].speed[0]),bg=config.MDlblCol))
+    frame.details.content.append(tk.Label(frame.details,text='Speed-X: '+str(frame.core.Lcp.speed[0]),bg=config.MDlblCol))
     frame.details.content[-1].grid(row=8,column=0,sticky='nsew',padx=1,pady=1)
-    frame.details.content.append(tk.Label(frame.details,text='Speed-Y: '+str(frame.db[frame.lab.active].speed[1]),bg=config.MDlblCol))
+    frame.details.content.append(tk.Label(frame.details,text='Speed-Y: '+str(frame.core.Lcp.speed[1]),bg=config.MDlblCol))
     frame.details.content[-1].grid(row=8,column=1,sticky='nsew',padx=1,pady=1)
-    frame.details.content.append(tk.Label(frame.details,text='Author: '+frame.db[frame.lab.active].author,bg=config.MDlblCol))
+    frame.details.content.append(tk.Label(frame.details,text='Author: '+frame.core.Lcp.author,bg=config.MDlblCol))
     frame.details.content[-1].grid(row=9,column=0,sticky='nsew',padx=1,pady=1)
-    frame.details.content.append(tk.Label(frame.details,text='Committer: '+frame.db[frame.lab.active].committer,bg=config.MDlblCol))
+    frame.details.content.append(tk.Label(frame.details,text='Committer: '+frame.core.Lcp.committer,bg=config.MDlblCol))
     frame.details.content[-1].grid(row=9,column=1,sticky='nsew',padx=1,pady=1)
 
 def compute(frame):
     #frame: GUI
     test = False
     data,_ = Engine.Resize(frame.lab.data)
-    for i in frame.db:
+    for i in frame.core.Ddb:
         if data in i.data:
             test = True
-            frame.lab.active = frame.db.index(i)
+            active = frame.core.Ddb.index(i)
     if test == False:
-        frame.db.append(Data.Pattern(len(frame.db),Settings.user))
-        frame.db[-1].compute(frame.lab.data,frame.lab.count)
-        frame.lab.active = -1
+        frame.core.Ddb.append(Data.Pattern(len(frame.core.Ddb),Settings.user))
+        frame.core.Ddb[-1].compute(frame.lab.data,frame.lab.count)
+        active = -1
+    frame.core.Lcp = frame.core.Ddb[active]
+    frame.lab.active = frame.core.Lcp.period -1
+        
     updateLab(frame)
