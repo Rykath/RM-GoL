@@ -10,7 +10,9 @@ from functools import partial
 import Tkinter as tk
 
 import Main.settings as Settings
+import Main.utilities as Utils
 import E_std.__init__ as Engine
+import E_std.compute as Compute
 import Data.internal as Data
 import UI_Tk.config as config
 
@@ -34,23 +36,23 @@ def createWidgets(frame):
     frame.menubar.cmd.mir.add_command(label='mirror horizontal' ,command=partial(cmdMirror,frame.parent,'x'))
     frame.menubar.cmd.mir.add_command(label='mirror vertical'   ,command=partial(cmdMirror,frame.parent,'y'))
     frame.menubar.cmd.add_cascade(label='expand',menu=frame.menubar.cmd.exp)
-    frame.menubar.cmd.exp.add_command(label='left'  ,command=partial(cmdMove,frame.parent,left=1))
-    frame.menubar.cmd.exp.add_command(label='right' ,command=partial(cmdMove,frame.parent,right=1))
-    frame.menubar.cmd.exp.add_command(label='up'    ,command=partial(cmdMove,frame.parent,up=1))
-    frame.menubar.cmd.exp.add_command(label='down'  ,command=partial(cmdMove,frame.parent,down=1))
-    frame.menubar.cmd.exp.add_command(label='all sides',command=partial(cmdMove,frame.parent,four=1))
+    frame.menubar.cmd.exp.add_command(label='left'  ,command=partial(cmdMove,frame.parent,Utils.Border(left=1)))
+    frame.menubar.cmd.exp.add_command(label='right' ,command=partial(cmdMove,frame.parent,Utils.Border(right=1)))
+    frame.menubar.cmd.exp.add_command(label='up'    ,command=partial(cmdMove,frame.parent,Utils.Border(up=1)))
+    frame.menubar.cmd.exp.add_command(label='down'  ,command=partial(cmdMove,frame.parent,Utils.Border(down=1)))
+    frame.menubar.cmd.exp.add_command(label='all sides',command=partial(cmdMove,frame.parent,Utils.Border(four=1)))
     frame.menubar.cmd.add_cascade(label='retract',menu=frame.menubar.cmd.ret)
-    frame.menubar.cmd.ret.add_command(label='left'  ,command=partial(cmdMove,frame.parent,left=-1))
-    frame.menubar.cmd.ret.add_command(label='right' ,command=partial(cmdMove,frame.parent,right=-1))
-    frame.menubar.cmd.ret.add_command(label='up'    ,command=partial(cmdMove,frame.parent,up=-1))
-    frame.menubar.cmd.ret.add_command(label='down'  ,command=partial(cmdMove,frame.parent,down=-1))
-    frame.menubar.cmd.ret.add_command(label='all sides',command=partial(cmdMove,frame.parent,four=-1))
-    frame.menubar.cmd.ret.add_command(label='full shrink',command=partial(cmdResize,frame.parent))
+    frame.menubar.cmd.ret.add_command(label='left'  ,command=partial(cmdMove,frame.parent,Utils.Border(left=-1)))
+    frame.menubar.cmd.ret.add_command(label='right' ,command=partial(cmdMove,frame.parent,Utils.Border(right=-1)))
+    frame.menubar.cmd.ret.add_command(label='up'    ,command=partial(cmdMove,frame.parent,Utils.Border(up=-1)))
+    frame.menubar.cmd.ret.add_command(label='down'  ,command=partial(cmdMove,frame.parent,Utils.Border(down=-1)))
+    frame.menubar.cmd.ret.add_command(label='all sides',command=partial(cmdMove,frame.parent,Utils.Border(four=-1)))
+    frame.menubar.cmd.ret.add_command(label='full shrink',command=partial(cmdResize,frame.parent,Utils.Border(four=0)))
     frame.menubar.cmd.add_cascade(label='move',menu=frame.menubar.cmd.mov)
-    frame.menubar.cmd.mov.add_command(label='left'  ,command=partial(cmdMove,frame.parent,left=-1,right=1))
-    frame.menubar.cmd.mov.add_command(label='right' ,command=partial(cmdMove,frame.parent,right=-1,left=1))
-    frame.menubar.cmd.mov.add_command(label='up'    ,command=partial(cmdMove,frame.parent,up=-1,down=1))
-    frame.menubar.cmd.mov.add_command(label='down'  ,command=partial(cmdMove,frame.parent,down=-1,up=1))
+    frame.menubar.cmd.mov.add_command(label='left'  ,command=partial(cmdMove,frame.parent,Utils.Border(left=-1,right=1)))
+    frame.menubar.cmd.mov.add_command(label='right' ,command=partial(cmdMove,frame.parent,Utils.Border(right=-1,left=1)))
+    frame.menubar.cmd.mov.add_command(label='up'    ,command=partial(cmdMove,frame.parent,Utils.Border(up=-1,down=1)))
+    frame.menubar.cmd.mov.add_command(label='down'  ,command=partial(cmdMove,frame.parent,Utils.Border(down=-1,up=1)))
     frame.config(menu=frame.menubar)
     frame.board = []
     frame.data = []
@@ -129,48 +131,22 @@ def cmdTick(frame):
    
 def cmdRotate(frame,direction):
     #frame: GUI
-    if direction == 'cw':
-        frame.db[frame.lab.active].rotate()
-        frame.db[frame.lab.active].mirror(True,False)
-    elif direction == 'ccw':
-        frame.db[frame.lab.active].rotate()
-        frame.db[frame.lab.active].mirror(False,True)
+    Compute.rotate(frame.db[frame.lab.active],direction)
     updateLab(frame)
 
 def cmdMirror(frame,direction):
     #frame: GUI
-    if direction == 'x':
-        frame.db[frame.lab.active].mirror(True,False)
-    elif direction == 'y':
-        frame.db[frame.lab.active].mirror(False,True)
+    Compute.mirror(frame.db[frame.lab.active],direction)
     updateLab(frame)
 
-def cmdResize(frame,left=0,right=0,up=0,down=0,border=[],four=0):
+def cmdResize(frame,border):
     #frame: GUI
-    if len(border) != 4:
-        if four != 0:
-            border = [four,four,four,four]
-        else:
-            border = [left,right,up,down]
-    for i in border:
-        if i < 0:
-            i = 0
-    for i in range(len(border)):
-        frame.lab.Bborder[i] = border[i]
+    Compute.resize(frame,border)
     redrawGrid(frame)
 
-def cmdMove(frame,left=0,right=0,up=0,down=0,border=[],four=0):
+def cmdMove(frame,border):
     #frame: GUI
-    if len(border) != 4:
-        if four != 0:
-            border = [four,four,four,four]
-        else:
-            border = [left,right,up,down]
-    for i in range(len(border)):
-        if frame.lab.Bborder[i] + border[i] >= 0:
-            frame.lab.Bborder[i] += border[i]
-        else:
-            frame.lab.Bborder[i] = 0
+    Compute.move(frame,border)
     redrawGrid(frame)
     
 def updateLab(frame):

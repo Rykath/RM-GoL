@@ -85,10 +85,6 @@ class Pattern():
     def compute(self,data,count):
         data,count = Engine.Resize(data,count)
         data,count,shift = Engine.Tick(data,count)
-        '''self.data.append(data)
-        self.count.append(count)
-        self.dataNum.append(Compute.dataNum(self.data[-1]))
-        self.countNum.append(Compute.countNum(self.count[-1]))'''
         x = True
         y = 0
         while x:
