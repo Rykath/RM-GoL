@@ -13,6 +13,8 @@ Usage: config/settings for Tkinter-based GUI
 #control
 MCwidth = 250
 MCheight = 500
+MCbgCol = 'black'
+MCbutBgCol = 'white'
 
 #details
 MDwidth = MCwidth
