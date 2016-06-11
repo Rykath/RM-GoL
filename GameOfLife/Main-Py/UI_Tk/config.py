@@ -24,6 +24,10 @@ MDbutCol = 'white'
 MDlblCol = 'white'
 MDbutSCol = 'red' #special
 
+#viewer
+#browser
+VBheight = 5
+
 #lab
 #cells
 LCsize = 0
