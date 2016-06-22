@@ -2,6 +2,7 @@
 Created on Apr 2, 2016
 
 @author: Rykath
+Package: Main
 
 Main file
 '''
@@ -16,10 +17,10 @@ class Core():
 
 
 if __name__ == '__main__':
-    import Tkinter as tk
+    #import Tkinter as tk
     
     import UI_Tk.__init__ as UI
-    import Data.__init__ as Data
+    import Main.Data.__init__ as Data
     
     core = Core()
     

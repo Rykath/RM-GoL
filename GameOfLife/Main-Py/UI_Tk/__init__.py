@@ -8,7 +8,7 @@ Usage: Main file for Tkinter-based Graphical-User-Interface
 '''
 
 from functools import partial
-import Tkinter as tk
+import tkinter as tk
 
 import UI_Tk.config as config
 import UI_Tk.lab as lab

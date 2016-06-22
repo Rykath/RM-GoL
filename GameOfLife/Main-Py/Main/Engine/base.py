@@ -1,10 +1,10 @@
 '''
-Created on Apr 6, 2016
+Created on Jun 22, 2016
 
 @author: Rykath
-Package: E_std
+Package: Main.Engine
 
-Usage: main file for Engine with standard-algorithm
+Usage: base functions for standard-engine
 '''
 
 import math
@@ -175,5 +175,3 @@ def CellCount(data,x,y):
     if x != 0 and y != len(data)-1:
         s += data[y+1][x-1]
     return s
-        
-            

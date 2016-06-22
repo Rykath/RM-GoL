@@ -2,14 +2,14 @@
 Created on Apr 5, 2016
 
 @author: Rykath
-Package: Data
+Package: Main.Data
 
 Usage: Internal data-storage , classes
 '''
 
-import E_std.__init__ as Engine
-import E_std.compute as Compute
-from operator import pos
+import Main.Engine.base as Engine
+import Main.Engine.compute as Compute
+#from operator import pos
 
 class Pattern():
     '''

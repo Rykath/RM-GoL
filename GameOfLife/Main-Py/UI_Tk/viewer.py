@@ -7,7 +7,7 @@ Package: UI_Tk
 Usage: view patterns in database
 '''
 
-import Tkinter as tk
+import tkinter as tk
 from functools import partial
 
 import UI_Tk.config as config

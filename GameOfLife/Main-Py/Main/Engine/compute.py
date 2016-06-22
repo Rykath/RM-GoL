@@ -2,7 +2,7 @@
 Created on Apr 17, 2016
 
 @author: Rykath
-Package: E_std
+Package: Main.Engine
 
 Usage: Functions for computing patterns, Laboratory/Data
 '''

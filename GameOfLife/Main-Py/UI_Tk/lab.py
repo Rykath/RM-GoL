@@ -7,13 +7,13 @@ Package: UI_Tk
 Usage: functions for Laboratory/Viewer/Pattern creator
 '''
 from functools import partial
-import Tkinter as tk
+import tkinter as tk
 
 import Main.settings as Settings
 import Main.utilities as Utils
-import E_std.__init__ as Engine
-import E_std.compute as Compute
-import Data.internal as Data
+import Main.Engine.base as Engine
+import Main.Engine.compute as Compute
+import Main.Data.internal as Data
 import UI_Tk.config as config
 
 class GUILab():
