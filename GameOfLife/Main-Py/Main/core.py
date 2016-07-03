@@ -10,9 +10,9 @@ Core-class and related functions
 class Core():
     
     def __init__(self):
-        self.running = True
+        self.ui = {}
         #Database
         self.Ddb = [] #pattern-database (loaded patterns)
         #Laboratory
-        self.Lcp = None #current pattern
+        #self.Lcp = None #current pattern
         

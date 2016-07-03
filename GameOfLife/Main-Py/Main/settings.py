@@ -8,4 +8,4 @@ contains variables for settings and related functions
 
 user = 'Rykath' #will be removed!
 
-gui = 'console'
+gui = 'tk'
