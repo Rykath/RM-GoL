@@ -4,7 +4,7 @@ Created on May 26, 2016
 @author: Rykath
 Package: Main
 
-Usage: Utility-Classes
+Usage: Utility-Classes & Functions
 '''
 
 class Border():
@@ -90,4 +90,4 @@ class Border():
                 else:
                     self.array[2*i] += int(dimension[i]%2)
         self.update()
-        return self
+        return self     

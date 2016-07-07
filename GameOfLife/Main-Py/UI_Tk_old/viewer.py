@@ -2,7 +2,7 @@
 Created on May 27, 2016
 
 @author: Rykath
-Package: UI_Tk
+Package: UI_Tk_old
 
 Usage: view patterns in database
 '''
@@ -10,7 +10,7 @@ Usage: view patterns in database
 import tkinter as tk
 from functools import partial
 
-import UI_Tk.config as config
+import UI_Tk_old.config as config
 
 class GUIViewer():
     key = 'viewer'

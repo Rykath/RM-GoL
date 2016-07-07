@@ -2,7 +2,7 @@
 Created on Apr 3, 2016
 
 @author: Rykath
-Package: UI_Tk
+Package: UI_Tk_old
 
 Usage: config/settings for Tkinter-based GUI
 '''

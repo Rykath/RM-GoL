@@ -17,20 +17,21 @@ def runMain():
     core = Main.core.Core()
     running = True
     
-    obj = UI_db.UI_patternviewer(Main.settings.gui)
+    obj = UI_db.UI_patternviewer(Main.settings.gui,core)
     core.ui[obj.key] = obj
     
-    for k in core.ui.keys():
-        core.ui[k].create()
     while running:
         running = False
+        d = []
         for k in core.ui.keys():
             try:
-                core.ui['db-pv'].update()
+                core.ui[k].update()
             except(tkinter.TclError):
-                pass
+                d.append(k)
             else:
                 running = True
+        for k in d:
+            del core.ui[k]
 
 if __name__ == '__main__':
     runMain()

@@ -2,7 +2,7 @@
 Created on Apr 5, 2016
 
 @author: Rykath
-Package: UI_Tk
+Package: UI_Tk_old
 
 Usage: functions for Laboratory/Viewer/Pattern creator
 '''
@@ -14,7 +14,7 @@ import Main.utilities as Utils
 import Main.Engine.base as Engine
 import Main.Engine.compute as Compute
 import Main.Data.internal as Data
-import UI_Tk.config as config
+import UI_Tk_old.config as config
 
 class GUILab():
     key = 'lab'

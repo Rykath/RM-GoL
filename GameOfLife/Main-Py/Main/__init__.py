@@ -19,7 +19,7 @@ class Core():
 if __name__ == '__main__':
     #import Tkinter as tk
     
-    import UI_Tk.__init__ as UI
+    import UI_Tk_old.__init__ as UI
     import Main.Data.__init__ as Data
     
     core = Core()
