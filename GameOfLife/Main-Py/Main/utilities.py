@@ -7,6 +7,10 @@ Package: Main
 Usage: Utility-Classes & Functions
 '''
 
+def output(typ,message):
+    if typ == "error":
+        print(message)
+
 class Border():
     
     def __init__(self,left=None,right=None,up=None,down=None,array=None,array2=None,four=None,width=None,height=None,dimension=None):
@@ -90,4 +94,58 @@ class Border():
                 else:
                     self.array[2*i] += int(dimension[i]%2)
         self.update()
-        return self     
+        return self
+
+class Map():
+    
+    def __init__(self,dimension=2,size=[2,2],default=0,valid=[0,1]):
+        self.dimension = dimension
+        self.size = size
+        self.valid = valid
+        self.default = default
+        self.array = []
+        # build array
+        pos = []
+        for d in range(dimension):
+            pos.append(0)
+            for i in range(len(pos)):
+                pos[i] = 0
+            r = True
+            while r:
+                # append one element at specific position
+                a = self.array
+                for i in range(d+1):
+                    p = pos[i]
+                    if i == dimension-1:
+                        a.append(default)
+                    elif i == d:
+                        a.append([])
+                    else:
+                        a = a[p]
+                # calculate new position (like nested for-loop)
+                i = 0
+                pos[i] += 1
+                while pos[i] == self.size[i] and not i == d:
+                    pos[i] = 0
+                    i += 1
+                    pos[i] += 1
+                if pos[i] == self.size[i] and i == d:
+                    r = False
+    
+    def get(self,pos):
+        e = self.array
+        for i in range(len(pos)):
+            p = pos[i] % self.size[i]
+            e = e[p]
+        return e
+    
+    def set(self,pos,value):
+        e = self.array
+        if not value in self.valid:
+            value = self.default
+        for i in range(len(pos)):
+            p = pos[i] % self.size[i]
+            if i == len(pos)-1:
+                e[p] = value
+            else:
+                e = e[p]
