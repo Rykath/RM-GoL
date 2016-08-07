@@ -9,6 +9,8 @@ Usage: Utility-Classes & Functions
 
 def output(typ,message):
     if typ == "error":
+        print("Error: "+message)
+    elif typ == "console":
         print(message)
 
 class Border():
@@ -105,39 +107,17 @@ class Map():
         self.default = default
         self.array = []
         # build array
-        pos = []
-        for d in range(dimension):
-            pos.append(0)
-            for i in range(len(pos)):
-                pos[i] = 0
-            r = True
-            while r:
-                # append one element at specific position
-                a = self.array
-                for i in range(d+1):
-                    p = pos[i]
-                    if i == dimension-1:
-                        a.append(default)
-                    elif i == d:
-                        a.append([])
-                    else:
-                        a = a[p]
-                # calculate new position (like nested for-loop)
-                i = 0
-                pos[i] += 1
-                while pos[i] == self.size[i] and not i == d:
-                    pos[i] = 0
-                    i += 1
-                    pos[i] += 1
-                if pos[i] == self.size[i] and i == d:
-                    r = False
+        self.expand(size)
     
     def get(self,pos):
         e = self.array
-        for i in range(len(pos)):
-            p = pos[i] % self.size[i]
-            e = e[p]
-        return e
+        try:
+            for i in range(len(pos)):
+                p = pos[i] #% self.size[i]
+                e = e[p]
+            return e
+        except IndexError:
+            return None
     
     def set(self,pos,value):
         e = self.array
@@ -149,3 +129,32 @@ class Map():
                 e[p] = value
             else:
                 e = e[p]
+    
+    def expand(self,size):
+        pos = []
+        for d in range(self.dimension):
+            pos.append(0)
+            for i in range(len(pos)):
+                pos[i] = 0
+            r = True
+            while r:
+                # append one element at specific position
+                a = self.array
+                for i in range(d+1):
+                    p = pos[i]
+                    if i == self.dimension-1:
+                        a.append(self.default)
+                    elif i == d:
+                        a.append([])
+                    else:
+                        a = a[p]
+                # calculate new position (like nested for-loop)
+                while self.get(pos) != None:
+                    i = 0
+                    pos[i] += 1
+                    while pos[i] == size[i] and not i == d:
+                        pos[i] = 0
+                        i += 1
+                        pos[i] += 1
+                if pos[i] == size[i] and i == d:
+                    r = False

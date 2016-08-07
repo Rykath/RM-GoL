@@ -17,14 +17,29 @@ class Pattern():
         self.id = ID
         self.name = None
         self.mapL = None    # dead,living | 0,1
+        self.mapC = None    # cell count  | 0-8
     
     def input(self,name=None,array=[[]]):
         if name != None:
             self.name = name
         if array != [[]]:
-            self.mapL = Utils.Map(dimension=2,size=[len(array[0]),len(array)],default=0,valid=[0,1])
+            self.mapL = Utils.Map(dimension=3,size=[1,len(array[0]),len(array)],default=0,valid=[0,1])
             for y in range(len(array)):
                 for x in range(len(array[0])):
                     if array[y][x] == 1:
                         self.mapL.set([x,y],1)
-        
+    
+    def compute(self):
+        if self.mapL != None:
+            self.mapC = Utils.Map(dimension=self.mapL.dimension,size=self.mapL.size,default=0,valid=list(range(9)))
+            # assuming dimension = 3 (period,x,y)
+            for p in range(len(self.mapC.size[0])):
+                for x in range(len(self.mapC.size[1])):
+                    for y in range(len(self.mapC.size[2])):
+                        v = 0
+                        for X in range(-1,2):
+                            for Y in range(-1,2):
+                                a = self.mapL.get([p,x+X,y+Y])
+                                if a != None:
+                                    v += a
+                        self.mapC.set([p,x,y],v)
