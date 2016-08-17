@@ -16,6 +16,8 @@ class Pattern():
     def __init__(self,ID):
         self.id = ID
         self.name = None
+        self.computeLvl = 0
+        
         self.mapL = None    # dead,living | 0,1
         self.mapC = None    # cell count  | 0-8
     
@@ -30,9 +32,11 @@ class Pattern():
                         self.mapL.set([x,y],1)
     
     def compute(self):
+        if self.computeLvl == 0 and self.mapL != None:
+            pass    # compute pattern-type and next generations
         if self.mapL != None:
             self.mapC = Utils.Map(dimension=self.mapL.dimension,size=self.mapL.size,default=0,valid=list(range(9)))
-            # assuming dimension = 3 (period,x,y)
+            # assuming dimension = 3 (t,x,y)
             for p in range(len(self.mapC.size[0])):
                 for x in range(len(self.mapC.size[1])):
                     for y in range(len(self.mapC.size[2])):
@@ -40,6 +44,6 @@ class Pattern():
                         for X in range(-1,2):
                             for Y in range(-1,2):
                                 a = self.mapL.get([p,x+X,y+Y])
-                                if a != None:
+                                if a != None and (X,Y) != (0,0):
                                     v += a
                         self.mapC.set([p,x,y],v)
