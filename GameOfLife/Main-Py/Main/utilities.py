@@ -158,3 +158,94 @@ class Map():
                         pos[i] += 1
                 if pos[i] == size[i] and i == d:
                     r = False
+
+class Map2D():
+    '''
+    special case of Map-class
+    2-dimensional, rectangular
+    '''
+    self.dimension = 2
+    def __init__(self,size=[2,2],default=0,valid=[0,1],array=[]):
+        # assuming valid input
+        #-- size is list with 2 positive-integer entries
+        #-- default can be anything
+        #-- valid is list with anything as contents
+        #-- array is 2-dimensional, rectangular list with only valid or default entries
+        self.size = size
+        self.valid = valid
+        self.default = default
+        self.array = array
+        # recompute size
+        if self.array != []:
+            self.size = [len(self.array),len(self.array[0])]
+        # build array
+        else:
+            for u in range(self.size[0]):
+                self.array.append([])
+                for _ in range(self.size[1]):
+                    self.array[u].append(self.default)
+    
+    def get(self,pos):
+        # return content at given position
+        # assuming valid input
+        #-- pos is list with 2 integer entries
+        for i in range(self.dimension):
+            if pos[i] >= self.size[i] or pos[i] < self.size[i]*-1:
+                return None
+        return self.array[pos[0]][pos[1]]
+    
+    def set(self,pos,value):
+        # set content at given position to given value
+        # assuming valid input
+        #-- pos is list with 2 integer entries
+        for i in range(self.dimension):
+            if pos[i] >= self.size[i] or pos[i] < self.size[i]*-1:
+                return None
+        if value in self.valid:
+            self.array[pos[0],pos[1]] = value
+            return True
+        return None
+    
+    def copy(self):
+        # return copy of self
+        out = Map2D()
+        out.size = self.size[:]
+        out.default = self.default
+        out.valid = self.valid
+        out.array = []
+        for u in range(self.size[0]):
+            out.array.append([])
+            for v in range(self.size[1]):
+                out.array[u].append(self.get([u,v]))
+    
+    def shrink(self,mutate=True):
+        # delete default slices (rows/columns) at each side to shrink array
+        # returns difference (as border)
+        # get empty slices (False = empty, True = not empty)
+        U = []
+        V = []
+        for u in range(self.size[0]):
+            U.append(False)
+            for v in range(self.size[1]):
+                if len(V) <= v:
+                    V.append(False)
+                if self.get([u,v]) != self.default:
+                    U[u] = True
+                    V[v] = True
+        if True in U:   # 'True in V' is True as well
+            pass # create border and shrink
+        else:
+            array = []
+            size = [0,0]
+
+class Layers():
+    '''
+    contains multiple layers (2D-maps) with different sizes
+    '''
+    
+    def __init__(self):
+        self.data = []
+        self.size = 0
+    
+    def addLayer(self):
+        pass
