@@ -1,105 +1,18 @@
 '''
-Created on May 26, 2016
+Created on Aug 24, 2016
 
 @author: Rykath
-Package: Main
+Package: Utilities
 
-Usage: Utility-Classes & Functions
+Usage: Classes concerning multi-dimensional lists or maps
 '''
 
-def output(typ,message):
-    if typ == "error":
-        print("Error: "+message)
-    elif typ == "console":
-        print(message)
-
-class Border():
-    
-    def __init__(self,left=None,right=None,up=None,down=None,array=None,array2=None,four=None,width=None,height=None,dimension=None):
-        self.array = [0,0,0,0] # [left,right,up,down]
-        if dimension != None and len(dimension) == 2:
-            if width == None:
-                width = dimension[0]
-            if height == None:
-                height = dimension[1]
-        if width != None:
-            self.array[0] = int(width/2)
-            self.array[1] = int(width/2+width%2)
-        if height != None:
-            self.array[2] = int(height/2)
-            self.array[3] = int(height/2+height%2)
-        if four != None:
-            self.array = [four,four,four,four]
-        if array2 != None and len(array2) == 2:
-            self.array = [array2[0],array2[0],array2[1],array2[1]]
-        if array != None and len(array) == 4:
-            self.array = array[:]
-        if left != None:
-            self.array[0] = left
-            if right == None and width != None:
-                self.array[1] = width-left
-        if right != None:
-            self.array[1] = right
-            if left == None and width != None:
-                self.array[0] = width-right
-        if up != None:
-            self.array[2] = up
-            if down == None and height != None:
-                self.array[3] = height-up
-        if down != None:
-            self.array[3] = down
-            if up == None and height != None:
-                self.array[2] = height-down
-        self.update()
-    
-    def update(self):
-        self.left = self.array[0]
-        self.right = self.array[1]
-        self.up = self.array[2]
-        self.down = self.array[3]
-        self.dict = {'left': self.array[0],'right': self.array[1],'up': self.array[2],'down': self.array[3]}
-        if self.left == self.right: #horizontal
-            self.x = self.left
-        else:
-            self.x = None
-        if self.up == self.down: #vertical
-            self.y = self.up
-        else:
-            self.y = None
-        if self.x == self.y:
-            self.all = self.x
-        else:
-            self.all = None
-        self.array2 = [self.x,self.y]
-        self.dict2 = {'x': self.x,'y': self.y}
-        self.width = self.left + self.right
-        self.height = self.up + self.down
-        self.dimension = [self.width,self.height]
-    
-    def add(self,array=None,dimension=None,invert=False):
-        if invert:
-            if array != None:
-                for i in range(len(array)):
-                    array[i] *= -1
-            if dimension != None:
-                for i in range(len(dimension)):
-                    dimension[i] *= -1
-        if array != None and len(array) == 4:
-            for i in range(4):
-                self.array[i] += array[i]
-        elif dimension != None and len(dimension) == 2:
-            for i in range(2):
-                self.array[2*i] += int(dimension[i]/2)
-                self.array[2*i+1] += int(dimension[i]/2)
-                if self.array[2*i+1]<self.array[2*i]:
-                    self.array[2*i+1] += int(dimension[i]%2)
-                else:
-                    self.array[2*i] += int(dimension[i]%2)
-        self.update()
-        return self
-
 class Map():
+    '''
+    multi-dimensional list
     
+    WORK IN PROGRESS (see Map2D)
+    '''
     def __init__(self,dimension=2,size=[2,2],default=0,valid=[0,1]):
         self.dimension = dimension
         self.size = size
@@ -169,7 +82,7 @@ class Map2D():
         # assuming valid input
         #-- size is list with 2 positive-integer entries
         #-- default can be anything
-        #-- valid is list with anything as contents
+        #-- valid is list with anything as contents, if valid is empty all values are valid
         #-- array is 2-dimensional, rectangular list with only valid or default entries
         self.size = size
         self.valid = valid
@@ -201,7 +114,7 @@ class Map2D():
         for i in range(self.dimension):
             if pos[i] >= self.size[i] or pos[i] < self.size[i]*-1:
                 return None
-        if value in self.valid:
+        if value in self.valid or self.valid == []:
             self.array[pos[0],pos[1]] = value
             return True
         return None
@@ -233,8 +146,26 @@ class Map2D():
                 if self.get([u,v]) != self.default:
                     U[u] = True
                     V[v] = True
-        if True in U:   # 'True in V' is True as well
-            pass # create border and shrink
+        if True in U:   # 'True in V' has to be True as well
+            dist = [[0,0],[0,0]]
+            for u in range(self.size[0]):
+                if u == dist[0][0] and not U[u]:
+                    dist[0][0] = u+1
+            for u in range(self.size[0]-1,-1,-1):
+                if u == self.size[0]-dist[0][1]-1 and not U[u]:
+                    dist[0][1] = self.size[0]-u
+            for v in range(self.size[1]):
+                if v == dist[1][0] and not V[v]:
+                    dist[1][0] = v+1
+            for v in range(self.size[1]-1,-1,-1):
+                if v == self.size[1]-dist[1][1]-1 and not V[v]:
+                    dist[1][1] = self.size[1]-v
+            array = []
+            for u in range(dist[0][0],self.size[0]-dist[0][1]):
+                array.append([])
+                for v in range(dist[1][0],self.size[0]-dist[1][1]):
+                    array[u-dist[0][0]].append(self.get([u,v]))
+            size = [self.size[0]-dist[0][0]-dist[0][1],self.size[1]-dist[1][0]-dist[1][1]]
         else:
             array = []
             size = [0,0]
