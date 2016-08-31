@@ -115,7 +115,7 @@ class Map2D():
             if pos[i] >= self.size[i] or pos[i] < self.size[i]*-1:
                 return None
         if value in self.valid or self.valid == []:
-            self.array[pos[0],pos[1]] = value
+            self.array[pos[0]][pos[1]] = value
             return True
         return None
     
@@ -134,8 +134,8 @@ class Map2D():
     
     def shrink(self,mutate=True):
         # delete default slices (rows/columns) at each side to shrink array
-        # returns difference (as border)
-        # get empty slices (False = empty, True = not empty)
+        # returns difference or difference and shrinked map if mutate is False
+        #get empty slices (False = empty, True = not empty)
         U = []
         V = []
         for u in range(self.size[0]):
@@ -146,7 +146,7 @@ class Map2D():
                 if self.get([u,v]) != self.default:
                     U[u] = True
                     V[v] = True
-        if True in U:   # 'True in V' has to be True as well
+        if True in U:   #'True in V' has to be True as well
             dist = [[0,0],[0,0]]
             for u in range(self.size[0]):
                 if u == dist[0][0] and not U[u]:
@@ -169,6 +169,32 @@ class Map2D():
         else:
             array = []
             size = [0,0]
+        if mutate:
+            self.array = array
+            self.size = size
+            return [dist]
+        else:
+            out = self.copy()
+            out.array = array
+            out.size = size
+            return [dist,out]
+    
+    def expand(self,dist=[[0,0],[0,0]],four=0,mutate=True):
+        # add default slices (rows/columns) at each side to expand array
+        # assuming valid input
+        #-- dist is a list with 2 lists which contain 2 (positive) integers each
+        #-- four is a (positive) integer
+        if four != 0:
+            dist=[[four,four],[four,four]]
+        size = [self.size[0]+dist[0][0]+dist[0][1],self.size[1]+dist[1][0]+dist[1][1]]
+        array = []
+        for u in range(size[0]):
+            array.append([])
+            for v in range(size[1]):
+                if u >= dist[0][0] and u < self.size[0]+dist[0][1] and v >= dist[1][0] and v < self.size[1]+dist[1][1]:
+                    array[u].append(self.get([u-dist[0][0],v-dist[1][0]]))
+                else:
+                    array[u].append(self.default)
         if mutate:
             self.array = array
             self.size = size
