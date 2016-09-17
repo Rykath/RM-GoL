@@ -191,7 +191,7 @@ class Map2D():
         for u in range(size[0]):
             array.append([])
             for v in range(size[1]):
-                if u >= dist[0][0] and u < self.size[0]+dist[0][1] and v >= dist[1][0] and v < self.size[1]+dist[1][1]:
+                if u >= dist[0][0] and u < self.size[0]+dist[0][0] and v >= dist[1][0] and v < self.size[1]+dist[1][0]:
                     array[u].append(self.get([u-dist[0][0],v-dist[1][0]]))
                 else:
                     array[u].append(self.default)
@@ -203,6 +203,29 @@ class Map2D():
             out.array = array
             out.size = size
             return out
+    
+    def expandTo(self,size,mutate=True):
+        # expands array to a given size if possible
+        # shrinks the array otherwise to smallest possible
+        #-- returns dist
+        if mutate:
+            obj = self
+        else:
+            obj = self.copy()
+        dist = obj.shrink(True)[0]
+        exp = [[0,0],[0,0]]
+        for i in range(2):
+            if obj.size[i] < size[i]:
+                exp[i][0] = round((size[i]-obj.size[i])/2-0.25)
+                exp[i][1] = round((size[i]-obj.size[i])/2+0.25)
+        for i in range(2):
+            for ii in range(2):
+                dist[i][ii] = exp[i][ii]-dist[i][ii]
+        obj.expand(dist=exp)
+        if mutate:
+            return [dist]
+        else:
+            return [dist,obj]
 
 class Layers():
     '''
