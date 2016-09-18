@@ -78,12 +78,16 @@ class Map2D():
     2-dimensional, rectangular
     '''
     dimension = 2
-    def __init__(self,size=[2,2],default=0,valid=[0,1],array=[]):
+    def __init__(self,size=None,default=None,valid=None,array=None):
         # assuming valid input
         #-- size is list with 2 positive-integer entries
         #-- default can be anything
         #-- valid is list with anything as contents, if valid is empty all values are valid
         #-- array is 2-dimensional, rectangular list with only valid or default entries
+        if size == None:
+            size = [2,2]
+        if array == None:
+            array = []
         self.size = size
         self.valid = valid
         self.default = default
@@ -114,7 +118,7 @@ class Map2D():
         for i in range(self.dimension):
             if pos[i] >= self.size[i] or pos[i] < self.size[i]*-1:
                 return None
-        if value in self.valid or self.valid == []:
+        if  self.valid == None or value in self.valid:
             self.array[pos[0]][pos[1]] = value
             return True
         return None

@@ -12,12 +12,13 @@ def runMain():
     
     import Main.core
     import Main.settings
-    import Main.Interface.database as UI_db
+    #import Main.Interface.database as UI_db
+    import Main.Interface.laboratory as UI_lab
     
     core = Main.core.Core()
     running = True
     
-    obj = UI_db.UI_patternviewer(Main.settings.gui,core)
+    obj = UI_lab.UI_laboratory(Main.settings.gui,core)
     core.ui[obj.key] = obj
     
     while running:

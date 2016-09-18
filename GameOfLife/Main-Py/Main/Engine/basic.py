@@ -45,8 +45,8 @@ def getCount(mapL):
             c = 0
             for X in range(-1,2):
                 for Y in range(-1,2):
-                    if (X,Y) != (0,0) and x+X > 0 and x+X < mapC.size[0]+1 and y+Y > 0 and y+Y < mapC.size[1]+1:
-                        c += mapL.get([x+X-1,y+Y-1])
+                    if (X,Y) != (0,0) and x+X >= 0 and x+X < mapC.size[0] and y+Y >= 0 and y+Y < mapC.size[1]:
+                        c += mapL.get([x+X,y+Y])
             mapC.set([x,y],c)
     return mapC
 

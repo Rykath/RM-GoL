@@ -26,7 +26,6 @@ class UI_patternviewer():
         self.frame = self.GUI.create(self.key)
         self.frame.parent = self
         Common.menubar(self)
-        self.frame.config(menu=self.frame.menu)
     
     def update(self):
         self.GUI.update(self.frame)

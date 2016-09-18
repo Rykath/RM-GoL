@@ -12,3 +12,11 @@ user = 'Rykath' #will be removed!
 # GUI-handlers:    tkinter    pygame
 # Packages:        UI_Tk_old      UI_Pg 
 gui = 'tkinter'
+
+# laboratory
+labSize = [10,10]
+# board/cells
+cellColL = '#000000' #Bg
+cellColD = '#FFFFFF'
+cellFColL = '#FFFFFF' #Font
+cellFColD = '#000000'

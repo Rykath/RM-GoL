@@ -10,3 +10,4 @@ Usage: init-module for UI_Tk package
 # GUI-handler: tkinter
 import UI_Tk.database as database
 import UI_Tk.common as common
+import UI_Tk.laboratory as laboratory
