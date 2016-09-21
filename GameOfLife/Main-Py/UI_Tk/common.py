@@ -2,7 +2,7 @@
 Created on Jul 7, 2016
 
 @author: Rykath
-Package: Main.Interface
+Package: UI_Tk
 
 Usage: functions/content used in several modules
 '''
@@ -11,11 +11,21 @@ import tkinter as Tk
 
 def menubar(frame,content):
     frame.menu = Tk.Menu(frame)
-    #frame.submenu = []
+    menubarBuild(frame,frame.menu,content)
+    frame.config(menu=frame.menu)
+
+def menubarBuild(frame,menu,content):
+    # sub-function of menubar
+    #! only called by menubar
+    #! recursive
+    submenu = []
     for i in content:
         if i[0] == 'button':
-            frame.menu.add_command(label=i[1],command=i[2])
-    frame.config(menu=frame.menu)
+            menu.add_command(label=i[1],command=i[2])
+        if i[0] == 'menu':
+            submenu.append(Tk.Menu(frame))
+            menubarBuild(frame,submenu[-1],i[2])
+            menu.add_cascade(label=i[1],menu=submenu[-1])
 
 def close(frame):
     frame.destroy()

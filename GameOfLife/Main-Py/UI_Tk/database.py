@@ -2,7 +2,7 @@
 Created on Jul 3, 2016
 
 @author: Rykath
-Package: Main.Interface
+Package: UI_Tk
 
 Usage: database related tkinter-functions for the UI
 '''
