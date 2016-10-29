@@ -79,7 +79,6 @@ class Map2D():
     '''
     dimension = 2
     def __init__(self,size=None,default=None,valid=None,array=None):
-        # assuming valid input
         #-- size is list with 2 positive-integer entries
         #-- default can be anything
         #-- valid is list with anything as contents, if valid is empty all values are valid
@@ -104,7 +103,6 @@ class Map2D():
     
     def get(self,pos):
         # return content at given position
-        # assuming valid input
         #-- pos is list with 2 integer entries
         for i in range(self.dimension):
             if pos[i] >= self.size[i] or pos[i] < self.size[i]*-1:
@@ -113,7 +111,6 @@ class Map2D():
     
     def set(self,pos,value):
         # set content at given position to given value
-        # assuming valid input
         #-- pos is list with 2 integer entries
         for i in range(self.dimension):
             if pos[i] >= self.size[i] or pos[i] < self.size[i]*-1:
@@ -185,7 +182,6 @@ class Map2D():
     
     def expand(self,dist=[[0,0],[0,0]],four=0,mutate=True):
         # add default slices (rows/columns) at each side to expand array
-        # assuming valid input
         #-- dist is a list with 2 lists which contain 2 (positive) integers each
         #-- four is a (positive) integer
         if four != 0:
@@ -238,7 +234,40 @@ class Layers():
     
     def __init__(self):
         self.data = []
+        self.pos = []   # global offset
         self.size = 0
     
-    def addLayer(self):
-        pass
+    def addLayer(self,layer,pos=None,off=None):
+        # add a new layer
+        #-- layer is Map2D
+        #-- pos is [x,y] | global (rel to first) offset | dominant argument
+        #-- off is [x,y] | relative to last offset
+        if pos != None:
+            p = pos.copy()
+        elif off != None:
+            if self.size != 0:
+                p = [self.pos[-1][i]+off[i] for i in range(2)]
+            else:
+                p = off.copy()
+        elif self.size != 0:
+            p = self.pos[-1].copy()
+        else:
+            p = [0,0]
+        self.data.append(layer.copy())
+        self.pos.append(p)
+        self.size += 1
+    
+    def get(self,pos):
+        #-- pos is [i,x,y]
+        if pos[0] >= self.size or pos[0] < self.size*-1:
+            return None
+        return(self.data[pos[0]].get(pos[1:]))
+    
+    def getLayer(self,pos,mutate=True):
+        #-- pos is integer | index
+        if pos >= self.size or pos < self.size*-1:
+            return None
+        if mutate:
+            return(self.data[pos])
+        else:
+            return(self.data[pos].copy())

@@ -50,7 +50,7 @@ def getCount(mapL):
             mapC.set([x,y],c)
     return mapC
 
-def getNxtGen(mapL,mapC,rules=[[3],[2,3]]):
+def getNxtGen(mapL,mapC=None,rules=[[3],[2,3]]):
     # returns Map2D with cells of next generation
     #-- mapL & mapC are Map2D with same size
     #-- output is same size as input
