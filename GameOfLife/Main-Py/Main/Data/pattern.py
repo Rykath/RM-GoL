@@ -34,12 +34,13 @@ class Pattern():
             self.mapL.addLayer(Utilities.map.Map2D(array=array,default=Main.settings.MapLdef,valid=Main.settings.MapLval).shrink(False)[1])
     
     def compute(self):
+        # compute pattern
+        # assuming mapL contains one layer, mapC is empty
         iteration = 0
-        done = False
-        while not done and iteration < Main.settings.CmptMaxIter:
+        while self.rep == None and iteration < Main.settings.CmptMaxIter:
             # add next generation
             o = Main.Engine.basic.getNxtGen(self.mapL.getLayer(-1,False).expand(four=1,mutate=False)).shrink(False)
-            d = [1-i for i in o[0][0]]
+            d = [1-o[0][i][0] for i in range(2)]
             for i in range(self.mapL.size):
                 if o[1].array == self.mapL.getLayer(i).array:
                     self.rep = i
@@ -50,13 +51,17 @@ class Pattern():
         self.mapC = Utilities.map.Layers()
         for i in range(self.size):
             o = Main.Engine.basic.getCount(self.mapL.getLayer(i,False).expand(four=1,mutate=False)).shrink(False)
-            d = [1-i for i in o[0][0]]
-            self.mapC.addLayer(o[1],off=d)
+            d = [self.mapL.pos[i][ii]+1-o[0][ii][0] for ii in range(2)]
+            self.mapC.addLayer(o[1],pos=d)
         self.computeLvl = 1
         if self.rep == 0 and self.size == 1:
             self.type = "stilllife"
         if self.rep != 0 and self.size-self.rep == 1:
             self.type = "stilllife-constructor"
+        if self.rep == 0 and [sum([self.mapL.pos[i][ii] for i in range(self.size)]) for ii in range(2)] == [0,0]:
+            self.type = "oscillator"
+        if self.rep == 0 and [sum([self.mapL.pos[i][ii] for i in range(self.size)]) for ii in range(2)] != [0,0]:
+            self.type = "spaceship"
         self.computeLvl = 2
     
     def export(self,short=True):
@@ -77,7 +82,11 @@ class Pattern():
                     if i != 0:
                         s += "."
                     for ii in range(2):
-                        s += str(o.getLayer(i).size[ii])+"."+str(o.pos[i][ii])+"."
+                        if i == 0:
+                            p = o.pos[i][ii]
+                        else:
+                            p = o.pos[i][ii]-o.pos[i-1][ii]
+                        s += str(o.getLayer(i).size[ii])+"."+str(p)+"."
                     S = ""
                     for x in range(o.getLayer(i).size[0]):
                         for y in range(o.getLayer(i).size[1]):
