@@ -147,8 +147,8 @@ class Map2D():
                 if self.get([u,v]) != self.default:
                     U[u] = True
                     V[v] = True
+        dist = [[0,0],[0,0]]
         if True in U:   #'True in V' has to be True as well
-            dist = [[0,0],[0,0]]
             for u in range(self.size[0]):
                 if u == dist[0][0] and not U[u]:
                     dist[0][0] = u+1
@@ -175,9 +175,7 @@ class Map2D():
             self.size = size
             return [dist]
         else:
-            out = self.copy()
-            out.array = array
-            out.size = size
+            out = Map2D(size=size,default=self.default,valid=self.valid,array=array)
             return [dist,out]
     
     def expand(self,dist=[[0,0],[0,0]],four=0,mutate=True):
