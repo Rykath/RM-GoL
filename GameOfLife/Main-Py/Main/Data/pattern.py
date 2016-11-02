@@ -7,7 +7,10 @@ Package: Main.Data
 Usage: class for single patterns
 '''
 
+import re   # regular expressions
+
 import Utilities.map
+import Utilities.misc
 import Main.settings
 import Main.Engine.basic
 
@@ -64,17 +67,19 @@ class Pattern():
             self.type = "spaceship"
         self.computeLvl = 2
     
-    def export(self,short=True):
+    def exportString(self,short=True):
         e = ""
         if not short:
             e = "\n"
         s = "#simple-pattern#"+e
         s += "id:"+self.id+"|"+e
+        s += "clvl:"+str(self.computeLvl)+"|"+e
         if self.name != None:
             s += "name:"+self.name+"|"+e
         if self.computeLvl >= 2:
             s += "type:"+self.type+"|"+e
         if self.computeLvl >= 1:
+            s += "size:"+str(self.size)+"|"+e
             for I in range(2):
                 s += ["mapl:","mapc:"][I]
                 o = [self.mapL,self.mapC][I]
@@ -91,10 +96,46 @@ class Pattern():
                     for x in range(o.getLayer(i).size[0]):
                         for y in range(o.getLayer(i).size[1]):
                             S += str(o.getLayer(i).get([x,y]))
-                    s += hex(int(S,[2,9][I]))[2:]
+                    s += Utilities.misc.baseXToBaseY(S,[2,9][I],16)
                 s += "|"+e
         s += "end#"
         return s
+    
+    def importString(self,string):
+        entries = re.split('#|\|',string)
+        for e in entries:
+            s = re.split(':',e)
+            if len(s) == 2:
+                if s[0] == "id":
+                    self.id = s[1]
+                if s[0] == "clvl":
+                    self.computeLvl = int(s[1])
+                if s[0] == "name":
+                    self.name = s[1]
+                if s[0] == "type":
+                    self.type = s[1]
+                if s[0] == "size":
+                    self.size = int(s[1])
+                if s[0] in ["mapl","mapc"]:
+                    I = ["mapl","mapc"].index(s[0])
+                    s.append(re.split('\.',s[1]))
+                    if self.size == 0:
+                        self.size = len(s[2])//5
+                    a = Utilities.map.Layers()
+                    for i in range(self.size):
+                        S = Utilities.misc.baseXToBaseY(s[2][5*i+4],16,[2,9][I])
+                        while len(S) < int(s[2][5*i])*int(s[2][5*i+2]):
+                            S = '0'+S
+                        array = []
+                        for x in range(int(s[2][5*i])):
+                            array.append([])
+                            for y in range(int(s[2][5*i+2])):
+                                array[x].append(S[x*int(s[2][5*i+2])+y])
+                        a.addLayer(Utilities.map.Map2D(valid=[Main.settings.MapLval,Main.settings.MapCval][I],default=[Main.settings.MapLdef,Main.settings.MapCdef][I],array=array),off=[int(s[2][5*i+1]),int(s[2][5*i+3])])
+                    if s[0] == "mapl":
+                        self.mapL = a
+                    if s[0] == "mapc":
+                        self.mapC = a
 
 '''
 class Pattern_old():
